@@ -137,11 +137,11 @@ BarWidget {
   Row {
     id: contentRow
     anchors.centerIn: parent
-    spacing: Style.space(5)
+    spacing: Style.space(6)
 
     Text {
-      text: "󰄀"
-      color: root.popupOpen ? Color.accent : Qt.darker(root.bar.foreground, 1.2)
+      text: "📷"
+      color: root.popupOpen ? Color.accent : Qt.darker(root.bar.foreground, 1.1)
       font.family: root.bar.fontFamily
       font.pixelSize: Style.font.title
       anchors.verticalCenter: parent.verticalCenter
@@ -150,9 +150,9 @@ BarWidget {
 
     Rectangle {
       visible: root.totalCount > 0
-      width: Math.max(countText.implicitWidth + Style.space(8), Style.space(18))
-      height: Style.space(16)
-      radius: Style.space(8)
+      width: Math.max(countText.implicitWidth + Style.space(10), Style.space(20))
+      height: Style.space(18)
+      radius: Style.space(9)
       color: Style.normalFillFor(root.bar.foreground, Color.accent)
       anchors.verticalCenter: parent.verticalCenter
 
@@ -162,7 +162,7 @@ BarWidget {
         text: String(root.totalCount)
         color: root.bar.foreground
         font.family: root.bar.fontFamily
-        font.pixelSize: Style.font.caption - 2
+        font.pixelSize: Style.font.caption - 1
         font.bold: true
       }
     }
@@ -204,20 +204,20 @@ BarWidget {
     bar: root.bar
     owner: root
     open: root.popupOpen
-    contentWidth: popup.fittedContentWidth(Style.space(430))
+    contentWidth: popup.fittedContentWidth(Style.space(480))
     contentHeight: popup.fittedContentHeight(mainColumn.implicitHeight + Style.space(24))
 
     Column {
       id: mainColumn
-      width: Style.space(430)
-      spacing: Style.space(10)
+      width: Style.space(480)
+      spacing: Style.space(12)
 
       // =======================================================================
       // A. HEADER ROW
       // =======================================================================
       Item {
         width: parent.width
-        height: Style.space(26)
+        height: Style.space(30)
 
         Row {
           anchors.left: parent.left
@@ -225,9 +225,7 @@ BarWidget {
           spacing: Style.space(8)
 
           Text {
-            text: "󰄀"
-            color: Color.accent
-            font.family: root.bar.fontFamily
+            text: "📷"
             font.pixelSize: Style.font.title
             anchors.verticalCenter: parent.verticalCenter
           }
@@ -250,25 +248,25 @@ BarWidget {
 
           // Area Selection Button
           Rectangle {
-            height: Style.space(24)
-            width: areaRow.implicitWidth + Style.space(14)
-            radius: Style.space(12)
+            height: Style.space(28)
+            width: areaRow.implicitWidth + Style.space(16)
+            radius: Style.space(14)
             color: areaMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
 
             Row {
               id: areaRow
               anchors.centerIn: parent
-              spacing: Style.space(4)
+              spacing: Style.space(6)
               Text {
                 text: "✂️"
-                font.pixelSize: Style.font.caption - 2
+                font.pixelSize: Style.font.bodySmall
                 anchors.verticalCenter: parent.verticalCenter
               }
               Text {
                 text: "Område"
                 color: areaMouse.containsMouse ? Color.background : root.bar.foreground
                 font.family: root.bar.fontFamily
-                font.pixelSize: Style.font.caption
+                font.pixelSize: Style.font.bodySmall
                 font.bold: true
                 anchors.verticalCenter: parent.verticalCenter
               }
@@ -285,25 +283,25 @@ BarWidget {
 
           // Fullscreen Button
           Rectangle {
-            height: Style.space(24)
-            width: fullRow.implicitWidth + Style.space(14)
-            radius: Style.space(12)
+            height: Style.space(28)
+            width: fullRow.implicitWidth + Style.space(16)
+            radius: Style.space(14)
             color: fullMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
 
             Row {
               id: fullRow
               anchors.centerIn: parent
-              spacing: Style.space(4)
+              spacing: Style.space(6)
               Text {
                 text: "🖥️"
-                font.pixelSize: Style.font.caption - 2
+                font.pixelSize: Style.font.bodySmall
                 anchors.verticalCenter: parent.verticalCenter
               }
               Text {
                 text: "Helskärm"
                 color: fullMouse.containsMouse ? Color.background : root.bar.foreground
                 font.family: root.bar.fontFamily
-                font.pixelSize: Style.font.caption
+                font.pixelSize: Style.font.bodySmall
                 font.bold: true
                 anchors.verticalCenter: parent.verticalCenter
               }
@@ -320,16 +318,16 @@ BarWidget {
 
           // Close Button
           Rectangle {
-            width: Style.space(24)
-            height: Style.space(24)
-            radius: Style.space(4)
+            width: Style.space(28)
+            height: Style.space(28)
+            radius: Style.space(6)
             color: closeMouse.containsMouse ? Style.normalFillFor(root.bar.foreground, Color.urgent) : "transparent"
 
             Text {
               anchors.centerIn: parent
               text: "✕"
               color: closeMouse.containsMouse ? Color.urgent : Qt.darker(root.bar.foreground, 1.4)
-              font.pixelSize: Style.font.caption
+              font.pixelSize: Style.font.bodySmall
               font.bold: true
             }
 
@@ -350,19 +348,19 @@ BarWidget {
       Rectangle {
         visible: root.toastMessage !== ""
         width: parent.width
-        implicitHeight: toastText.implicitHeight + Style.space(10)
-        radius: Style.space(4)
+        implicitHeight: toastText.implicitHeight + Style.space(12)
+        radius: Style.space(6)
         color: root.toastType === "urgent" ? Style.normalFillFor(Color.urgent, Color.urgent) : Style.normalFillFor(Color.accent, Color.accent)
         border.color: root.toastType === "urgent" ? Color.urgent : Color.accent
 
         Text {
           id: toastText
           anchors.fill: parent
-          anchors.margins: Style.space(6)
+          anchors.margins: Style.space(8)
           text: root.toastMessage
           color: root.toastType === "urgent" ? Color.urgent : Color.accent
           font.family: root.bar.fontFamily
-          font.pixelSize: Style.font.caption
+          font.pixelSize: Style.font.bodySmall
           font.bold: true
           wrapMode: Text.WordWrap
         }
@@ -373,30 +371,30 @@ BarWidget {
       // =======================================================================
       Row {
         width: parent.width
-        spacing: Style.space(6)
+        spacing: Style.space(8)
 
         // Tab: Senaste / Preview
         Rectangle {
-          width: (parent.width - Style.space(6)) / 2
-          height: Style.space(28)
-          radius: Style.space(14)
+          width: (parent.width - Style.space(8)) / 2
+          height: Style.space(34)
+          radius: Style.space(17)
           color: root.currentTab === "latest" ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
           border.color: root.currentTab === "latest" ? Color.accent : "transparent"
 
           Row {
             anchors.centerIn: parent
-            spacing: Style.space(6)
+            spacing: Style.space(8)
             Text {
               text: "🖼️"
-              font.pixelSize: Style.font.caption
+              font.pixelSize: Style.font.body
               anchors.verticalCenter: parent.verticalCenter
             }
             Text {
               text: "Förhandsvisning"
               color: root.currentTab === "latest" ? Color.background : root.bar.foreground
               font.family: root.bar.fontFamily
-              font.pixelSize: Style.font.caption
-              font.bold: root.currentTab === "latest"
+              font.pixelSize: Style.font.bodySmall
+              font.bold: true
               anchors.verticalCenter: parent.verticalCenter
             }
           }
@@ -411,26 +409,26 @@ BarWidget {
 
         // Tab: Historik
         Rectangle {
-          width: (parent.width - Style.space(6)) / 2
-          height: Style.space(28)
-          radius: Style.space(14)
+          width: (parent.width - Style.space(8)) / 2
+          height: Style.space(34)
+          radius: Style.space(17)
           color: root.currentTab === "history" ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
           border.color: root.currentTab === "history" ? Color.accent : "transparent"
 
           Row {
             anchors.centerIn: parent
-            spacing: Style.space(6)
+            spacing: Style.space(8)
             Text {
               text: "📜"
-              font.pixelSize: Style.font.caption
+              font.pixelSize: Style.font.body
               anchors.verticalCenter: parent.verticalCenter
             }
             Text {
               text: "Historik (" + root.totalCount + ")"
               color: root.currentTab === "history" ? Color.background : root.bar.foreground
               font.family: root.bar.fontFamily
-              font.pixelSize: Style.font.caption
-              font.bold: root.currentTab === "history"
+              font.pixelSize: Style.font.bodySmall
+              font.bold: true
               anchors.verticalCenter: parent.verticalCenter
             }
           }
@@ -455,8 +453,8 @@ BarWidget {
         // 1. Interactive Image Preview Area
         Rectangle {
           width: parent.width
-          height: Style.space(240)
-          radius: Style.space(6)
+          height: Style.space(250)
+          radius: Style.space(8)
           color: Color.background
           border.color: Style.normalFillFor(root.bar.foreground, Color.accent)
           clip: true
@@ -464,7 +462,7 @@ BarWidget {
           Image {
             id: mainPreviewImg
             anchors.fill: parent
-            anchors.margins: Style.space(4)
+            anchors.margins: Style.space(6)
             source: root.currentScreenshot ? root.currentScreenshot.uri : (root.latestScreenshot ? root.latestScreenshot.uri : "")
             fillMode: Image.PreserveAspectFit
             asynchronous: true
@@ -483,22 +481,22 @@ BarWidget {
               Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "📷"
-                font.pixelSize: Style.space(36)
+                font.pixelSize: Style.space(40)
               }
               Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "Inga skärmdumpar hittades"
                 color: root.bar.foreground
                 font.family: root.bar.fontFamily
-                font.pixelSize: Style.font.body
+                font.pixelSize: Style.font.titleSmall
                 font.bold: true
               }
               Text {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "Klicka på 'Område' eller 'Helskärm' för att ta en."
+                text: "Klicka på 'Område' eller 'Helskärm' för att ta en ny skärmdump."
                 color: Qt.darker(root.bar.foreground, 1.4)
                 font.family: root.bar.fontFamily
-                font.pixelSize: Style.font.caption
+                font.pixelSize: Style.font.bodySmall
               }
             }
           }
@@ -518,7 +516,7 @@ BarWidget {
         // 2. Metadata Info Bar
         Rectangle {
           width: parent.width
-          implicitHeight: metaCol.implicitHeight + Style.space(10)
+          implicitHeight: metaCol.implicitHeight + Style.space(14)
           radius: Style.space(6)
           color: Style.normalFillFor(root.bar.foreground, Color.accent)
           visible: root.currentScreenshot || root.latestScreenshot
@@ -526,8 +524,8 @@ BarWidget {
           Column {
             id: metaCol
             anchors.fill: parent
-            anchors.margins: Style.space(8)
-            spacing: Style.space(4)
+            anchors.margins: Style.space(10)
+            spacing: Style.space(6)
 
             // Filename
             Text {
@@ -537,7 +535,7 @@ BarWidget {
               }
               color: root.bar.foreground
               font.family: root.bar.fontFamily
-              font.pixelSize: Style.font.bodySmall
+              font.pixelSize: Style.font.body
               font.bold: true
               elide: Text.ElideMiddle
               width: parent.width
@@ -545,12 +543,12 @@ BarWidget {
 
             // Specs row
             Row {
-              spacing: Style.space(10)
+              spacing: Style.space(14)
 
               // Dimensions
               Row {
-                spacing: Style.space(4)
-                Text { text: "📐"; font.pixelSize: Style.font.caption - 2 }
+                spacing: Style.space(5)
+                Text { text: "📐"; font.pixelSize: Style.font.caption }
                 Text {
                   text: {
                     var s = root.currentScreenshot || root.latestScreenshot
@@ -558,15 +556,15 @@ BarWidget {
                   }
                   color: Color.accent
                   font.family: root.bar.fontFamily
-                  font.pixelSize: Style.font.caption - 1
+                  font.pixelSize: Style.font.caption
                   font.bold: true
                 }
               }
 
               // File size
               Row {
-                spacing: Style.space(4)
-                Text { text: "💾"; font.pixelSize: Style.font.caption - 2 }
+                spacing: Style.space(5)
+                Text { text: "💾"; font.pixelSize: Style.font.caption }
                 Text {
                   text: {
                     var s = root.currentScreenshot || root.latestScreenshot
@@ -574,14 +572,15 @@ BarWidget {
                   }
                   color: Qt.darker(root.bar.foreground, 1.2)
                   font.family: root.bar.fontFamily
-                  font.pixelSize: Style.font.caption - 1
+                  font.pixelSize: Style.font.caption
+                  font.bold: true
                 }
               }
 
               // Relative time
               Row {
-                spacing: Style.space(4)
-                Text { text: "🕒"; font.pixelSize: Style.font.caption - 2 }
+                spacing: Style.space(5)
+                Text { text: "🕒"; font.pixelSize: Style.font.caption }
                 Text {
                   text: {
                     var s = root.currentScreenshot || root.latestScreenshot
@@ -589,7 +588,7 @@ BarWidget {
                   }
                   color: Qt.darker(root.bar.foreground, 1.2)
                   font.family: root.bar.fontFamily
-                  font.pixelSize: Style.font.caption - 1
+                  font.pixelSize: Style.font.caption
                 }
               }
             }
@@ -600,7 +599,7 @@ BarWidget {
         Rectangle {
           visible: root.confirmDelete
           width: parent.width
-          implicitHeight: delCol.implicitHeight + Style.space(12)
+          implicitHeight: delCol.implicitHeight + Style.space(16)
           radius: Style.space(6)
           color: Style.normalFillFor(Color.urgent, Color.urgent)
           border.color: Color.urgent
@@ -608,23 +607,23 @@ BarWidget {
           Column {
             id: delCol
             anchors.fill: parent
-            anchors.margins: Style.space(8)
-            spacing: Style.space(6)
+            anchors.margins: Style.space(10)
+            spacing: Style.space(8)
 
             Text {
               text: "⚠ Vill du verkligen ta bort denna skärmdump?"
               color: Color.urgent
               font.family: root.bar.fontFamily
-              font.pixelSize: Style.font.caption
+              font.pixelSize: Style.font.bodySmall
               font.bold: true
             }
 
             Row {
-              spacing: Style.space(6)
+              spacing: Style.space(8)
 
               Rectangle {
-                width: Style.space(100)
-                height: Style.space(26)
+                width: Style.space(110)
+                height: Style.space(30)
                 radius: Style.space(4)
                 color: Color.urgent
 
@@ -646,8 +645,8 @@ BarWidget {
               }
 
               Rectangle {
-                width: Style.space(80)
-                height: Style.space(26)
+                width: Style.space(90)
+                height: Style.space(30)
                 radius: Style.space(4)
                 color: Style.normalFillFor(root.bar.foreground, Color.accent)
 
@@ -673,30 +672,30 @@ BarWidget {
         // 4. Action Buttons Grid
         Column {
           width: parent.width
-          spacing: Style.space(6)
+          spacing: Style.space(8)
           visible: (root.currentScreenshot || root.latestScreenshot) && !root.confirmDelete
 
           // Primary Actions: Edit & View Fullscreen
           Row {
             width: parent.width
-            spacing: Style.space(6)
+            spacing: Style.space(8)
 
             // Redigera (Tensaku / Pinta)
             Rectangle {
-              width: (parent.width - Style.space(6)) / 2
-              height: Style.space(32)
-              radius: Style.space(4)
+              width: (parent.width - Style.space(8)) / 2
+              height: Style.space(36)
+              radius: Style.space(6)
               color: editBtnMouse.containsMouse ? Qt.darker(Color.accent, 1.2) : Color.accent
 
               Row {
                 anchors.centerIn: parent
-                spacing: Style.space(6)
-                Text { text: "✏️"; font.pixelSize: Style.font.bodySmall; anchors.verticalCenter: parent.verticalCenter }
+                spacing: Style.space(8)
+                Text { text: "✏️"; font.pixelSize: Style.font.body; anchors.verticalCenter: parent.verticalCenter }
                 Text {
                   text: "Redigera / Rita"
                   color: Color.background
                   font.family: root.bar.fontFamily
-                  font.pixelSize: Style.font.caption
+                  font.pixelSize: Style.font.bodySmall
                   font.bold: true
                   anchors.verticalCenter: parent.verticalCenter
                 }
@@ -716,22 +715,22 @@ BarWidget {
 
             // Visa Fullskärm (imv)
             Rectangle {
-              width: (parent.width - Style.space(6)) / 2
-              height: Style.space(32)
-              radius: Style.space(4)
+              width: (parent.width - Style.space(8)) / 2
+              height: Style.space(36)
+              radius: Style.space(6)
               color: viewBtnMouse.containsMouse ? Style.normalFillFor(root.bar.foreground, Color.accent) : "transparent"
               border.color: Style.normalFillFor(root.bar.foreground, Color.accent)
               border.width: Style.space(1)
 
               Row {
                 anchors.centerIn: parent
-                spacing: Style.space(6)
-                Text { text: "👁️"; font.pixelSize: Style.font.bodySmall; anchors.verticalCenter: parent.verticalCenter }
+                spacing: Style.space(8)
+                Text { text: "👁️"; font.pixelSize: Style.font.body; anchors.verticalCenter: parent.verticalCenter }
                 Text {
                   text: "Visa fullstorlek"
                   color: root.bar.foreground
                   font.family: root.bar.fontFamily
-                  font.pixelSize: Style.font.caption
+                  font.pixelSize: Style.font.bodySmall
                   font.bold: true
                   anchors.verticalCenter: parent.verticalCenter
                 }
@@ -753,24 +752,24 @@ BarWidget {
           // System AI Integration: Copy Path & Copy Image Data
           Row {
             width: parent.width
-            spacing: Style.space(6)
+            spacing: Style.space(8)
 
             // Kopiera Sökväg (Till Claude, Antigravity, Gemini)
             Rectangle {
-              width: (parent.width - Style.space(6)) / 2
-              height: Style.space(30)
-              radius: Style.space(4)
+              width: (parent.width - Style.space(8)) / 2
+              height: Style.space(34)
+              radius: Style.space(6)
               color: copyPathMouse.containsMouse ? Style.normalFillFor(root.bar.foreground, Color.accent) : Style.normalFillFor(root.bar.foreground, Color.accent)
 
               Row {
                 anchors.centerIn: parent
-                spacing: Style.space(6)
-                Text { text: "📋"; font.pixelSize: Style.font.caption; anchors.verticalCenter: parent.verticalCenter }
+                spacing: Style.space(8)
+                Text { text: "📋"; font.pixelSize: Style.font.bodySmall; anchors.verticalCenter: parent.verticalCenter }
                 Text {
                   text: "Kopiera sökväg"
                   color: root.bar.foreground
                   font.family: root.bar.fontFamily
-                  font.pixelSize: Style.font.caption - 1
+                  font.pixelSize: Style.font.bodySmall
                   font.bold: true
                   anchors.verticalCenter: parent.verticalCenter
                 }
@@ -790,20 +789,20 @@ BarWidget {
 
             // Kopiera Bilddata (Till Urklipp)
             Rectangle {
-              width: (parent.width - Style.space(6)) / 2
-              height: Style.space(30)
-              radius: Style.space(4)
+              width: (parent.width - Style.space(8)) / 2
+              height: Style.space(34)
+              radius: Style.space(6)
               color: copyImgMouse.containsMouse ? Style.normalFillFor(root.bar.foreground, Color.accent) : Style.normalFillFor(root.bar.foreground, Color.accent)
 
               Row {
                 anchors.centerIn: parent
-                spacing: Style.space(6)
-                Text { text: "🖼️"; font.pixelSize: Style.font.caption; anchors.verticalCenter: parent.verticalCenter }
+                spacing: Style.space(8)
+                Text { text: "🖼️"; font.pixelSize: Style.font.bodySmall; anchors.verticalCenter: parent.verticalCenter }
                 Text {
                   text: "Kopiera bild"
                   color: root.bar.foreground
                   font.family: root.bar.fontFamily
-                  font.pixelSize: Style.font.caption - 1
+                  font.pixelSize: Style.font.bodySmall
                   font.bold: true
                   anchors.verticalCenter: parent.verticalCenter
                 }
@@ -825,21 +824,21 @@ BarWidget {
           // Radera knapp
           Rectangle {
             width: parent.width
-            height: Style.space(28)
-            radius: Style.space(4)
+            height: Style.space(32)
+            radius: Style.space(6)
             color: delMouse.containsMouse ? Style.normalFillFor(Color.urgent, Color.urgent) : "transparent"
             border.color: Style.normalFillFor(Color.urgent, Color.urgent)
             border.width: Style.space(1)
 
             Row {
               anchors.centerIn: parent
-              spacing: Style.space(6)
-              Text { text: "🗑️"; font.pixelSize: Style.font.caption; anchors.verticalCenter: parent.verticalCenter }
+              spacing: Style.space(8)
+              Text { text: "🗑️"; font.pixelSize: Style.font.bodySmall; anchors.verticalCenter: parent.verticalCenter }
               Text {
                 text: "Ta bort denna skärmdump"
                 color: Color.urgent
                 font.family: root.bar.fontFamily
-                font.pixelSize: Style.font.caption - 1
+                font.pixelSize: Style.font.bodySmall
                 font.bold: true
                 anchors.verticalCenter: parent.verticalCenter
               }
@@ -860,7 +859,7 @@ BarWidget {
       }
 
       // =======================================================================
-      // E. TAB 2: HISTORY GALLERY
+      // E. TAB 2: HISTORY GALLERY (Spacious, Legible Cards)
       // =======================================================================
       Column {
         width: parent.width
@@ -869,13 +868,14 @@ BarWidget {
 
         Rectangle {
           width: parent.width
-          implicitHeight: Math.min(Style.space(380), historyCol.implicitHeight)
-          radius: Style.space(6)
+          implicitHeight: Math.min(Style.space(420), historyCol.implicitHeight + Style.space(12))
+          radius: Style.space(8)
           color: Style.normalFillFor(root.bar.foreground, Color.accent)
           clip: true
 
           Flickable {
             anchors.fill: parent
+            anchors.margins: Style.space(6)
             contentHeight: historyCol.implicitHeight
             boundsBehavior: Flickable.StopAtBounds
             clip: true
@@ -883,38 +883,30 @@ BarWidget {
             Column {
               id: historyCol
               width: parent.width
+              spacing: Style.space(6)
 
               Repeater {
                 model: root.screenshots
 
                 Rectangle {
                   width: historyCol.width
-                  implicitHeight: histRow.implicitHeight + Style.space(12)
+                  implicitHeight: histRow.implicitHeight + Style.space(14)
+                  radius: Style.space(6)
                   property bool isSelected: root.currentScreenshot && root.currentScreenshot.path === modelData.path
                   color: isSelected ? Style.normalFillFor(Color.accent, Color.accent) : (histMouse.containsMouse ? Style.normalFillFor(root.bar.foreground, Color.accent) : "transparent")
-
-                  Rectangle {
-                    anchors.bottom: parent.bottom
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.leftMargin: Style.space(8)
-                    anchors.rightMargin: Style.space(8)
-                    height: Style.space(1)
-                    color: Style.normalFillFor(root.bar.foreground, root.bar.foreground)
-                    opacity: 0.2
-                    visible: index < root.screenshots.length - 1
-                  }
+                  border.color: isSelected ? Color.accent : "transparent"
+                  border.width: Style.space(1)
 
                   Row {
                     id: histRow
                     anchors.fill: parent
-                    anchors.margins: Style.space(6)
-                    spacing: Style.space(8)
+                    anchors.margins: Style.space(8)
+                    spacing: Style.space(12)
 
-                    // Thumbnail Box
+                    // 1. Large Thumbnail Box
                     Rectangle {
-                      width: Style.space(48)
-                      height: Style.space(48)
+                      width: Style.space(64)
+                      height: Style.space(54)
                       radius: Style.space(4)
                       color: Color.background
                       border.color: Style.normalFillFor(root.bar.foreground, Color.accent)
@@ -931,69 +923,77 @@ BarWidget {
                       }
                     }
 
-                    // Metadata Text
+                    // 2. Large, Clear Metadata Text
                     Column {
-                      width: parent.width - Style.space(160)
+                      width: parent.width - Style.space(220)
                       anchors.verticalCenter: parent.verticalCenter
-                      spacing: Style.space(2)
+                      spacing: Style.space(4)
 
+                      // Filename (Big & Bold)
                       Text {
                         text: modelData.filename
                         color: root.bar.foreground
                         font.family: root.bar.fontFamily
-                        font.pixelSize: Style.font.caption
+                        font.pixelSize: Style.font.bodySmall
                         font.bold: true
                         elide: Text.ElideMiddle
                         width: parent.width
                       }
 
+                      // Specs Row (Dimensions & File Size)
                       Row {
                         spacing: Style.space(6)
                         Text {
                           text: modelData.dimensions || ""
                           color: Color.accent
                           font.family: root.bar.fontFamily
-                          font.pixelSize: Style.font.caption - 2
+                          font.pixelSize: Style.font.caption
                           font.bold: true
                         }
                         Text {
                           text: "•"
                           color: Qt.darker(root.bar.foreground, 1.5)
-                          font.pixelSize: Style.font.caption - 2
+                          font.pixelSize: Style.font.caption
                         }
                         Text {
                           text: modelData.size_human
-                          color: Qt.darker(root.bar.foreground, 1.3)
+                          color: Qt.darker(root.bar.foreground, 1.2)
                           font.family: root.bar.fontFamily
-                          font.pixelSize: Style.font.caption - 2
+                          font.pixelSize: Style.font.caption
+                          font.bold: true
                         }
                       }
 
-                      Text {
-                        text: modelData.relative_time
-                        color: Qt.darker(root.bar.foreground, 1.4)
-                        font.family: root.bar.fontFamily
-                        font.pixelSize: Style.font.caption - 3
+                      // Timestamp
+                      Row {
+                        spacing: Style.space(4)
+                        Text { text: "🕒"; font.pixelSize: Style.font.caption - 2 }
+                        Text {
+                          text: modelData.relative_time
+                          color: Qt.darker(root.bar.foreground, 1.3)
+                          font.family: root.bar.fontFamily
+                          font.pixelSize: Style.font.caption
+                        }
                       }
                     }
 
-                    // Quick Action Icons on the right
+                    // 3. Large, Easy-to-Click Action Buttons on the right
                     Row {
                       anchors.right: parent.right
                       anchors.verticalCenter: parent.verticalCenter
-                      spacing: Style.space(4)
+                      spacing: Style.space(6)
 
-                      // Edit Icon
+                      // Edit Button
                       Rectangle {
-                        width: Style.space(24)
-                        height: Style.space(24)
-                        radius: Style.space(3)
-                        color: hEditMouse.containsMouse ? Color.accent : "transparent"
+                        width: Style.space(32)
+                        height: Style.space(32)
+                        radius: Style.space(4)
+                        color: hEditMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
 
                         Text {
                           anchors.centerIn: parent
                           text: "✏️"
-                          font.pixelSize: Style.font.caption - 2
+                          font.pixelSize: Style.font.bodySmall
                         }
 
                         MouseArea {
@@ -1005,17 +1005,17 @@ BarWidget {
                         }
                       }
 
-                      // Copy Path Icon
+                      // Copy Path Button
                       Rectangle {
-                        width: Style.space(24)
-                        height: Style.space(24)
-                        radius: Style.space(3)
-                        color: hCopyMouse.containsMouse ? Color.accent : "transparent"
+                        width: Style.space(32)
+                        height: Style.space(32)
+                        radius: Style.space(4)
+                        color: hCopyMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
 
                         Text {
                           anchors.centerIn: parent
                           text: "📋"
-                          font.pixelSize: Style.font.caption - 2
+                          font.pixelSize: Style.font.bodySmall
                         }
 
                         MouseArea {
@@ -1027,17 +1027,17 @@ BarWidget {
                         }
                       }
 
-                      // View Icon
+                      // View Button
                       Rectangle {
-                        width: Style.space(24)
-                        height: Style.space(24)
-                        radius: Style.space(3)
-                        color: hViewMouse.containsMouse ? Color.accent : "transparent"
+                        width: Style.space(32)
+                        height: Style.space(32)
+                        radius: Style.space(4)
+                        color: hViewMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
 
                         Text {
                           anchors.centerIn: parent
                           text: "👁️"
-                          font.pixelSize: Style.font.caption - 2
+                          font.pixelSize: Style.font.bodySmall
                         }
 
                         MouseArea {
@@ -1049,17 +1049,17 @@ BarWidget {
                         }
                       }
 
-                      // Delete Icon
+                      // Delete Button
                       Rectangle {
-                        width: Style.space(24)
-                        height: Style.space(24)
-                        radius: Style.space(3)
-                        color: hDelMouse.containsMouse ? Color.urgent : "transparent"
+                        width: Style.space(32)
+                        height: Style.space(32)
+                        radius: Style.space(4)
+                        color: hDelMouse.containsMouse ? Color.urgent : Style.normalFillFor(root.bar.foreground, Color.urgent)
 
                         Text {
                           anchors.centerIn: parent
                           text: "🗑️"
-                          font.pixelSize: Style.font.caption - 2
+                          font.pixelSize: Style.font.bodySmall
                         }
 
                         MouseArea {
@@ -1096,7 +1096,7 @@ BarWidget {
 
                 Column {
                   anchors.centerIn: parent
-                  spacing: Style.space(6)
+                  spacing: Style.space(8)
                   Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: "📷"
@@ -1107,7 +1107,8 @@ BarWidget {
                     text: "Ingen historik än"
                     color: root.bar.foreground
                     font.family: root.bar.fontFamily
-                    font.pixelSize: Style.font.bodySmall
+                    font.pixelSize: Style.font.body
+                    font.bold: true
                   }
                 }
               }
