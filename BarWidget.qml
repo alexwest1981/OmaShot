@@ -224,13 +224,13 @@ BarWidget {
     bar: root.bar
     owner: root
     open: root.popupOpen
-    contentWidth: popup.fittedContentWidth(Style.space(490))
-    contentHeight: popup.fittedContentHeight(mainColumn.implicitHeight + Style.space(24))
+    contentWidth: popup.fittedContentWidth(Style.space(530))
+    contentHeight: popup.fittedContentHeight(mainColumn.implicitHeight + Style.space(28))
 
     Column {
       id: mainColumn
-      width: Style.space(490)
-      spacing: Style.space(12)
+      width: Style.space(530)
+      spacing: Style.space(10)
 
       // =======================================================================
       // A. HEADER ROW
@@ -268,25 +268,25 @@ BarWidget {
 
           // Area Selection Button
           Rectangle {
-            height: Style.space(28)
-            width: areaRow.implicitWidth + Style.space(16)
-            radius: Style.space(14)
+            height: Style.space(26)
+            width: areaRow.implicitWidth + Style.space(14)
+            radius: Style.space(13)
             color: areaMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
 
             Row {
               id: areaRow
               anchors.centerIn: parent
-              spacing: Style.space(6)
+              spacing: Style.space(5)
               Text {
                 text: "✂️"
-                font.pixelSize: Style.font.bodySmall
+                font.pixelSize: Style.font.caption
                 anchors.verticalCenter: parent.verticalCenter
               }
               Text {
                 text: root.tr("region")
                 color: areaMouse.containsMouse ? Color.background : root.bar.foreground
                 font.family: root.bar.fontFamily
-                font.pixelSize: Style.font.bodySmall
+                font.pixelSize: Style.font.caption
                 font.bold: true
                 anchors.verticalCenter: parent.verticalCenter
               }
@@ -303,25 +303,25 @@ BarWidget {
 
           // Fullscreen Button
           Rectangle {
-            height: Style.space(28)
-            width: fullRow.implicitWidth + Style.space(16)
-            radius: Style.space(14)
+            height: Style.space(26)
+            width: fullRow.implicitWidth + Style.space(14)
+            radius: Style.space(13)
             color: fullMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
 
             Row {
               id: fullRow
               anchors.centerIn: parent
-              spacing: Style.space(6)
+              spacing: Style.space(5)
               Text {
                 text: "🖥️"
-                font.pixelSize: Style.font.bodySmall
+                font.pixelSize: Style.font.caption
                 anchors.verticalCenter: parent.verticalCenter
               }
               Text {
                 text: root.tr("fullscreen")
                 color: fullMouse.containsMouse ? Color.background : root.bar.foreground
                 font.family: root.bar.fontFamily
-                font.pixelSize: Style.font.bodySmall
+                font.pixelSize: Style.font.caption
                 font.bold: true
                 anchors.verticalCenter: parent.verticalCenter
               }
@@ -338,16 +338,16 @@ BarWidget {
 
           // Close Button
           Rectangle {
-            width: Style.space(28)
-            height: Style.space(28)
-            radius: Style.space(6)
+            width: Style.space(26)
+            height: Style.space(26)
+            radius: Style.space(5)
             color: closeMouse.containsMouse ? Style.normalFillFor(root.bar.foreground, Color.urgent) : "transparent"
 
             Text {
               anchors.centerIn: parent
               text: "✕"
               color: closeMouse.containsMouse ? Color.urgent : Qt.darker(root.bar.foreground, 1.4)
-              font.pixelSize: Style.font.bodySmall
+              font.pixelSize: Style.font.caption
               font.bold: true
             }
 
@@ -368,7 +368,7 @@ BarWidget {
       Rectangle {
         visible: root.confirmDelete
         width: parent.width
-        implicitHeight: delCol.implicitHeight + Style.space(16)
+        implicitHeight: delCol.implicitHeight + Style.space(14)
         radius: Style.space(6)
         color: Style.normalFillFor(Color.urgent, Color.urgent)
         border.color: Color.urgent
@@ -376,14 +376,14 @@ BarWidget {
         Column {
           id: delCol
           anchors.fill: parent
-          anchors.margins: Style.space(10)
-          spacing: Style.space(8)
+          anchors.margins: Style.space(8)
+          spacing: Style.space(6)
 
           Text {
             text: "⚠ " + root.tr("delete_confirm_title", { name: root.deleteTargetName })
             color: Color.urgent
             font.family: root.bar.fontFamily
-            font.pixelSize: Style.font.bodySmall
+            font.pixelSize: Style.font.caption
             font.bold: true
             wrapMode: Text.WordWrap
             width: parent.width
@@ -393,8 +393,8 @@ BarWidget {
             spacing: Style.space(8)
 
             Rectangle {
-              width: Style.space(110)
-              height: Style.space(30)
+              width: Style.space(100)
+              height: Style.space(26)
               radius: Style.space(4)
               color: Color.urgent
 
@@ -416,8 +416,8 @@ BarWidget {
             }
 
             Rectangle {
-              width: Style.space(90)
-              height: Style.space(30)
+              width: Style.space(80)
+              height: Style.space(26)
               radius: Style.space(4)
               color: Style.normalFillFor(root.bar.foreground, Color.accent)
 
@@ -461,7 +461,7 @@ BarWidget {
           text: root.toastMessage
           color: root.toastType === "urgent" ? Color.urgent : Color.accent
           font.family: root.bar.fontFamily
-          font.pixelSize: Style.font.bodySmall
+          font.pixelSize: Style.font.caption
           font.bold: true
           wrapMode: Text.WordWrap
         }
@@ -477,25 +477,25 @@ BarWidget {
         // Tab: Preview
         Rectangle {
           width: (parent.width - Style.space(8)) / 2
-          height: Style.space(34)
-          radius: Style.space(17)
+          height: Style.space(30)
+          radius: Style.space(15)
           color: root.currentTab === "latest" ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
           border.color: root.currentTab === "latest" ? Color.accent : "transparent"
 
           Row {
             anchors.centerIn: parent
-            spacing: Style.space(8)
+            spacing: Style.space(6)
             Text {
               text: "🖼️"
-              font.pixelSize: Style.font.body
+              font.pixelSize: Style.font.caption
               anchors.verticalCenter: parent.verticalCenter
             }
             Text {
               text: root.tr("preview")
               color: root.currentTab === "latest" ? Color.background : root.bar.foreground
               font.family: root.bar.fontFamily
-              font.pixelSize: Style.font.bodySmall
-              font.bold: true
+              font.pixelSize: Style.font.caption
+              font.bold: root.currentTab === "latest"
               anchors.verticalCenter: parent.verticalCenter
             }
           }
@@ -511,25 +511,25 @@ BarWidget {
         // Tab: History
         Rectangle {
           width: (parent.width - Style.space(8)) / 2
-          height: Style.space(34)
-          radius: Style.space(17)
+          height: Style.space(30)
+          radius: Style.space(15)
           color: root.currentTab === "history" ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
           border.color: root.currentTab === "history" ? Color.accent : "transparent"
 
           Row {
             anchors.centerIn: parent
-            spacing: Style.space(8)
+            spacing: Style.space(6)
             Text {
               text: "📜"
-              font.pixelSize: Style.font.body
+              font.pixelSize: Style.font.caption
               anchors.verticalCenter: parent.verticalCenter
             }
             Text {
               text: root.tr("history_with_count", { count: root.totalCount })
               color: root.currentTab === "history" ? Color.background : root.bar.foreground
               font.family: root.bar.fontFamily
-              font.pixelSize: Style.font.bodySmall
-              font.bold: true
+              font.pixelSize: Style.font.caption
+              font.bold: root.currentTab === "history"
               anchors.verticalCenter: parent.verticalCenter
             }
           }
@@ -548,14 +548,14 @@ BarWidget {
       // =======================================================================
       Column {
         width: parent.width
-        spacing: Style.space(10)
+        spacing: Style.space(8)
         visible: root.currentTab === "latest"
 
-        // 1. Interactive Image Preview Area
+        // 1. Interactive Image Preview Area (Strict Aspect Ratio Fit inside boundary)
         Rectangle {
           width: parent.width
-          height: Style.space(250)
-          radius: Style.space(8)
+          height: Style.space(215)
+          radius: Style.space(6)
           color: Color.background
           border.color: Style.normalFillFor(root.bar.foreground, Color.accent)
           clip: true
@@ -578,18 +578,18 @@ BarWidget {
 
             Column {
               anchors.centerIn: parent
-              spacing: Style.space(8)
+              spacing: Style.space(6)
               Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "📷"
-                font.pixelSize: Style.space(40)
+                font.pixelSize: Style.space(36)
               }
               Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: root.tr("empty_preview_title")
                 color: root.bar.foreground
                 font.family: root.bar.fontFamily
-                font.pixelSize: Style.font.heading
+                font.pixelSize: Style.font.body
                 font.bold: true
               }
               Text {
@@ -597,7 +597,7 @@ BarWidget {
                 text: root.tr("empty_preview_sub")
                 color: Qt.darker(root.bar.foreground, 1.4)
                 font.family: root.bar.fontFamily
-                font.pixelSize: Style.font.bodySmall
+                font.pixelSize: Style.font.caption
               }
             }
           }
@@ -617,7 +617,7 @@ BarWidget {
         // 2. Metadata Info Bar
         Rectangle {
           width: parent.width
-          implicitHeight: metaCol.implicitHeight + Style.space(14)
+          implicitHeight: metaCol.implicitHeight + Style.space(12)
           radius: Style.space(6)
           color: Style.normalFillFor(root.bar.foreground, Color.accent)
           visible: root.currentScreenshot || root.latestScreenshot
@@ -625,8 +625,8 @@ BarWidget {
           Column {
             id: metaCol
             anchors.fill: parent
-            anchors.margins: Style.space(10)
-            spacing: Style.space(6)
+            anchors.margins: Style.space(8)
+            spacing: Style.space(4)
 
             // Filename
             Text {
@@ -636,7 +636,7 @@ BarWidget {
               }
               color: root.bar.foreground
               font.family: root.bar.fontFamily
-              font.pixelSize: Style.font.body
+              font.pixelSize: Style.font.caption
               font.bold: true
               elide: Text.ElideMiddle
               width: parent.width
@@ -644,12 +644,12 @@ BarWidget {
 
             // Specs row
             Row {
-              spacing: Style.space(14)
+              spacing: Style.space(12)
 
               // Dimensions
               Row {
-                spacing: Style.space(5)
-                Text { text: "📐"; font.pixelSize: Style.font.caption }
+                spacing: Style.space(4)
+                Text { text: "📐"; font.pixelSize: Style.font.caption - 1 }
                 Text {
                   text: {
                     var s = root.currentScreenshot || root.latestScreenshot
@@ -657,15 +657,15 @@ BarWidget {
                   }
                   color: Color.accent
                   font.family: root.bar.fontFamily
-                  font.pixelSize: Style.font.caption
+                  font.pixelSize: Style.font.caption - 1
                   font.bold: true
                 }
               }
 
               // File size
               Row {
-                spacing: Style.space(5)
-                Text { text: "💾"; font.pixelSize: Style.font.caption }
+                spacing: Style.space(4)
+                Text { text: "💾"; font.pixelSize: Style.font.caption - 1 }
                 Text {
                   text: {
                     var s = root.currentScreenshot || root.latestScreenshot
@@ -673,15 +673,15 @@ BarWidget {
                   }
                   color: Qt.darker(root.bar.foreground, 1.2)
                   font.family: root.bar.fontFamily
-                  font.pixelSize: Style.font.caption
+                  font.pixelSize: Style.font.caption - 1
                   font.bold: true
                 }
               }
 
               // Relative time
               Row {
-                spacing: Style.space(5)
-                Text { text: "🕒"; font.pixelSize: Style.font.caption }
+                spacing: Style.space(4)
+                Text { text: "🕒"; font.pixelSize: Style.font.caption - 1 }
                 Text {
                   text: {
                     var s = root.currentScreenshot || root.latestScreenshot
@@ -689,7 +689,7 @@ BarWidget {
                   }
                   color: Qt.darker(root.bar.foreground, 1.2)
                   font.family: root.bar.fontFamily
-                  font.pixelSize: Style.font.caption
+                  font.pixelSize: Style.font.caption - 1
                 }
               }
             }
@@ -699,30 +699,30 @@ BarWidget {
         // 3. Action Buttons Grid
         Column {
           width: parent.width
-          spacing: Style.space(8)
+          spacing: Style.space(6)
           visible: (root.currentScreenshot || root.latestScreenshot) && !root.confirmDelete
 
           // Primary Actions: Edit & View Fullscreen
           Row {
             width: parent.width
-            spacing: Style.space(8)
+            spacing: Style.space(6)
 
             // Edit (Tensaku / Pinta)
             Rectangle {
-              width: (parent.width - Style.space(8)) / 2
-              height: Style.space(36)
-              radius: Style.space(6)
+              width: (parent.width - Style.space(6)) / 2
+              height: Style.space(32)
+              radius: Style.space(5)
               color: editBtnMouse.containsMouse ? Qt.darker(Color.accent, 1.2) : Color.accent
 
               Row {
                 anchors.centerIn: parent
-                spacing: Style.space(8)
-                Text { text: "✏️"; font.pixelSize: Style.font.body; anchors.verticalCenter: parent.verticalCenter }
+                spacing: Style.space(6)
+                Text { text: "✏️"; font.pixelSize: Style.font.caption; anchors.verticalCenter: parent.verticalCenter }
                 Text {
                   text: root.tr("edit")
                   color: Color.background
                   font.family: root.bar.fontFamily
-                  font.pixelSize: Style.font.bodySmall
+                  font.pixelSize: Style.font.caption
                   font.bold: true
                   anchors.verticalCenter: parent.verticalCenter
                 }
@@ -742,22 +742,22 @@ BarWidget {
 
             // View Fullscreen (imv)
             Rectangle {
-              width: (parent.width - Style.space(8)) / 2
-              height: Style.space(36)
-              radius: Style.space(6)
+              width: (parent.width - Style.space(6)) / 2
+              height: Style.space(32)
+              radius: Style.space(5)
               color: viewBtnMouse.containsMouse ? Style.normalFillFor(root.bar.foreground, Color.accent) : "transparent"
               border.color: Style.normalFillFor(root.bar.foreground, Color.accent)
               border.width: Style.space(1)
 
               Row {
                 anchors.centerIn: parent
-                spacing: Style.space(8)
-                Text { text: "👁️"; font.pixelSize: Style.font.body; anchors.verticalCenter: parent.verticalCenter }
+                spacing: Style.space(6)
+                Text { text: "👁️"; font.pixelSize: Style.font.caption; anchors.verticalCenter: parent.verticalCenter }
                 Text {
                   text: root.tr("view_full")
                   color: root.bar.foreground
                   font.family: root.bar.fontFamily
-                  font.pixelSize: Style.font.bodySmall
+                  font.pixelSize: Style.font.caption
                   font.bold: true
                   anchors.verticalCenter: parent.verticalCenter
                 }
@@ -779,24 +779,24 @@ BarWidget {
           // System AI Integration: Copy Path & Copy Image Data
           Row {
             width: parent.width
-            spacing: Style.space(8)
+            spacing: Style.space(6)
 
             // Copy Path
             Rectangle {
-              width: (parent.width - Style.space(8)) / 2
-              height: Style.space(34)
-              radius: Style.space(6)
+              width: (parent.width - Style.space(6)) / 2
+              height: Style.space(30)
+              radius: Style.space(5)
               color: copyPathMouse.containsMouse ? Style.normalFillFor(root.bar.foreground, Color.accent) : Style.normalFillFor(root.bar.foreground, Color.accent)
 
               Row {
                 anchors.centerIn: parent
-                spacing: Style.space(8)
-                Text { text: "📋"; font.pixelSize: Style.font.bodySmall; anchors.verticalCenter: parent.verticalCenter }
+                spacing: Style.space(6)
+                Text { text: "📋"; font.pixelSize: Style.font.caption; anchors.verticalCenter: parent.verticalCenter }
                 Text {
                   text: root.tr("copy_path")
                   color: root.bar.foreground
                   font.family: root.bar.fontFamily
-                  font.pixelSize: Style.font.bodySmall
+                  font.pixelSize: Style.font.caption
                   font.bold: true
                   anchors.verticalCenter: parent.verticalCenter
                 }
@@ -816,20 +816,20 @@ BarWidget {
 
             // Copy Image
             Rectangle {
-              width: (parent.width - Style.space(8)) / 2
-              height: Style.space(34)
-              radius: Style.space(6)
+              width: (parent.width - Style.space(6)) / 2
+              height: Style.space(30)
+              radius: Style.space(5)
               color: copyImgMouse.containsMouse ? Style.normalFillFor(root.bar.foreground, Color.accent) : Style.normalFillFor(root.bar.foreground, Color.accent)
 
               Row {
                 anchors.centerIn: parent
-                spacing: Style.space(8)
-                Text { text: "🖼️"; font.pixelSize: Style.font.bodySmall; anchors.verticalCenter: parent.verticalCenter }
+                spacing: Style.space(6)
+                Text { text: "🖼️"; font.pixelSize: Style.font.caption; anchors.verticalCenter: parent.verticalCenter }
                 Text {
                   text: root.tr("copy_image")
                   color: root.bar.foreground
                   font.family: root.bar.fontFamily
-                  font.pixelSize: Style.font.bodySmall
+                  font.pixelSize: Style.font.caption
                   font.bold: true
                   anchors.verticalCenter: parent.verticalCenter
                 }
@@ -851,21 +851,21 @@ BarWidget {
           // Delete button
           Rectangle {
             width: parent.width
-            height: Style.space(32)
-            radius: Style.space(6)
+            height: Style.space(28)
+            radius: Style.space(5)
             color: delMouse.containsMouse ? Style.normalFillFor(Color.urgent, Color.urgent) : "transparent"
             border.color: Style.normalFillFor(Color.urgent, Color.urgent)
             border.width: Style.space(1)
 
             Row {
               anchors.centerIn: parent
-              spacing: Style.space(8)
-              Text { text: "🗑️"; font.pixelSize: Style.font.bodySmall; anchors.verticalCenter: parent.verticalCenter }
+              spacing: Style.space(6)
+              Text { text: "🗑️"; font.pixelSize: Style.font.caption; anchors.verticalCenter: parent.verticalCenter }
               Text {
                 text: root.tr("delete_btn")
                 color: Color.urgent
                 font.family: root.bar.fontFamily
-                font.pixelSize: Style.font.bodySmall
+                font.pixelSize: Style.font.caption
                 font.bold: true
                 anchors.verticalCenter: parent.verticalCenter
               }
@@ -912,7 +912,7 @@ BarWidget {
 
             delegate: Item {
               width: histListView.width
-              height: Style.space(66)
+              height: Style.space(64)
 
               Rectangle {
                 anchors.fill: parent
@@ -934,7 +934,7 @@ BarWidget {
                   // Thumbnail
                   Rectangle {
                     width: Style.space(56)
-                    height: Style.space(48)
+                    height: Style.space(46)
                     radius: Style.space(4)
                     color: "#111"
                     border.color: Style.normalFillFor(root.bar.foreground, Color.accent)
@@ -955,14 +955,14 @@ BarWidget {
                   Column {
                     anchors.verticalCenter: parent.verticalCenter
                     width: parent.width - Style.space(66)
-                    spacing: Style.space(3)
+                    spacing: Style.space(2)
 
                     // Filename
                     Text {
                       text: modelData.filename
                       color: root.bar.foreground
                       font.family: root.bar.fontFamily
-                      font.pixelSize: Style.font.bodySmall
+                      font.pixelSize: Style.font.caption
                       font.bold: true
                       elide: Text.ElideMiddle
                       width: parent.width
@@ -1027,8 +1027,8 @@ BarWidget {
 
                   // Edit Button
                   Rectangle {
-                    width: Style.space(30)
-                    height: Style.space(30)
+                    width: Style.space(28)
+                    height: Style.space(28)
                     radius: Style.space(4)
                     color: hEditMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
 
@@ -1049,8 +1049,8 @@ BarWidget {
 
                   // Copy Path Button
                   Rectangle {
-                    width: Style.space(30)
-                    height: Style.space(30)
+                    width: Style.space(28)
+                    height: Style.space(28)
                     radius: Style.space(4)
                     color: hCopyMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
 
@@ -1071,8 +1071,8 @@ BarWidget {
 
                   // View Button
                   Rectangle {
-                    width: Style.space(30)
-                    height: Style.space(30)
+                    width: Style.space(28)
+                    height: Style.space(28)
                     radius: Style.space(4)
                     color: hViewMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
 
@@ -1093,8 +1093,8 @@ BarWidget {
 
                   // Delete Button
                   Rectangle {
-                    width: Style.space(30)
-                    height: Style.space(30)
+                    width: Style.space(28)
+                    height: Style.space(28)
                     radius: Style.space(4)
                     color: hDelMouse.containsMouse ? Color.urgent : Style.normalFillFor(root.bar.foreground, Color.urgent)
 
