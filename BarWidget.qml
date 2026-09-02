@@ -224,12 +224,12 @@ BarWidget {
     bar: root.bar
     owner: root
     open: root.popupOpen
-    contentWidth: popup.fittedContentWidth(Style.space(530))
+    contentWidth: popup.fittedContentWidth(Style.space(560))
     contentHeight: popup.fittedContentHeight(mainColumn.implicitHeight + Style.space(28))
 
     Column {
       id: mainColumn
-      width: Style.space(530)
+      width: Style.space(560)
       spacing: Style.space(10)
 
       // =======================================================================
@@ -477,8 +477,8 @@ BarWidget {
         // Tab: Preview
         Rectangle {
           width: (parent.width - Style.space(8)) / 2
-          height: Style.space(30)
-          radius: Style.space(15)
+          height: Style.space(32)
+          radius: Style.space(16)
           color: root.currentTab === "latest" ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
           border.color: root.currentTab === "latest" ? Color.accent : "transparent"
 
@@ -487,14 +487,14 @@ BarWidget {
             spacing: Style.space(6)
             Text {
               text: "🖼️"
-              font.pixelSize: Style.font.caption
+              font.pixelSize: Style.font.bodySmall
               anchors.verticalCenter: parent.verticalCenter
             }
             Text {
               text: root.tr("preview")
               color: root.currentTab === "latest" ? Color.background : root.bar.foreground
               font.family: root.bar.fontFamily
-              font.pixelSize: Style.font.caption
+              font.pixelSize: Style.font.bodySmall
               font.bold: root.currentTab === "latest"
               anchors.verticalCenter: parent.verticalCenter
             }
@@ -511,8 +511,8 @@ BarWidget {
         // Tab: History
         Rectangle {
           width: (parent.width - Style.space(8)) / 2
-          height: Style.space(30)
-          radius: Style.space(15)
+          height: Style.space(32)
+          radius: Style.space(16)
           color: root.currentTab === "history" ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
           border.color: root.currentTab === "history" ? Color.accent : "transparent"
 
@@ -521,14 +521,14 @@ BarWidget {
             spacing: Style.space(6)
             Text {
               text: "📜"
-              font.pixelSize: Style.font.caption
+              font.pixelSize: Style.font.bodySmall
               anchors.verticalCenter: parent.verticalCenter
             }
             Text {
               text: root.tr("history_with_count", { count: root.totalCount })
               color: root.currentTab === "history" ? Color.background : root.bar.foreground
               font.family: root.bar.fontFamily
-              font.pixelSize: Style.font.caption
+              font.pixelSize: Style.font.bodySmall
               font.bold: root.currentTab === "history"
               anchors.verticalCenter: parent.verticalCenter
             }
@@ -544,31 +544,39 @@ BarWidget {
       }
 
       // =======================================================================
-      // E. TAB 1: PREVIEW & ACTIONS (Selected / Latest Screenshot)
+      // E. TAB 1: PREVIEW & ACTIONS (Larger Image Preview & Clean Buttons)
       // =======================================================================
       Column {
         width: parent.width
         spacing: Style.space(8)
         visible: root.currentTab === "latest"
 
-        // 1. Interactive Image Preview Area (Strict Aspect Ratio Fit inside boundary)
+        // 1. Interactive Image Preview Area (Generous size & strictly centered inside dark box)
         Rectangle {
           width: parent.width
-          height: Style.space(215)
-          radius: Style.space(6)
-          color: Color.background
+          height: Style.space(265)
+          radius: Style.space(8)
+          color: "#0c0d14"
           border.color: Style.normalFillFor(root.bar.foreground, Color.accent)
           clip: true
 
-          Image {
-            id: mainPreviewImg
+          Item {
             anchors.fill: parent
             anchors.margins: Style.space(6)
-            source: root.currentScreenshot ? root.currentScreenshot.uri : (root.latestScreenshot ? root.latestScreenshot.uri : "")
-            fillMode: Image.PreserveAspectFit
-            asynchronous: true
-            cache: false
-            smooth: true
+            clip: true
+
+            Image {
+              id: mainPreviewImg
+              anchors.centerIn: parent
+              width: parent.width
+              height: parent.height
+              source: root.currentScreenshot ? root.currentScreenshot.uri : (root.latestScreenshot ? root.latestScreenshot.uri : "")
+              fillMode: Image.PreserveAspectFit
+              asynchronous: true
+              cache: false
+              smooth: true
+              mipmap: true
+            }
           }
 
           // Fallback if no screenshots
@@ -636,7 +644,7 @@ BarWidget {
               }
               color: root.bar.foreground
               font.family: root.bar.fontFamily
-              font.pixelSize: Style.font.caption
+              font.pixelSize: Style.font.bodySmall
               font.bold: true
               elide: Text.ElideMiddle
               width: parent.width
