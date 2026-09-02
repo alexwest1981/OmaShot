@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "inkedalex.omashot",
+  "name": "OmaShot",
+  "version": "1.0.0",
+  "author": "Alex Weström",
+  "description": "Screenshot manager, quick capture widget, interactive preview, history gallery, and system/AI integration.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "OmaShot",
+    "description": "Screenshot manager with instant preview, editor launcher, and AI-ready file links.",
+    "category": "Utilities",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}
