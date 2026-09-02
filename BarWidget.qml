@@ -18,6 +18,7 @@ BarWidget {
   property string toastType: "info" // "info" | "success" | "urgent"
   property bool confirmDelete: false
   property string deleteTargetPath: ""
+  property string deleteTargetName: ""
 
   function showToast(msg, type) {
     toastMessage = msg
@@ -68,15 +69,23 @@ BarWidget {
     viewProc.running = true
   }
 
-  function askDelete(fpath) {
+  function askDelete(fpath, fname) {
+    if (!fpath) return
     deleteTargetPath = fpath
+    deleteTargetName = fname || fpath.split("/").pop()
     confirmDelete = true
   }
 
   function doDelete(fpath) {
     confirmDelete = false
     if (!fpath) return
-    deleteProc.command = ["python3", Quickshell.env("HOME") + "/.config/omarchy/plugins/custom.screenshots/screenshot_manager.py", "--delete", fpath]
+    var target = fpath
+    deleteTargetPath = ""
+    deleteTargetName = ""
+    if (root.currentScreenshot && root.currentScreenshot.path === target) {
+      root.currentScreenshot = null
+    }
+    deleteProc.command = ["python3", Quickshell.env("HOME") + "/.config/omarchy/plugins/custom.screenshots/screenshot_manager.py", "--delete", target]
     deleteProc.running = true
     showToast("🗑️ Skärmdumpen raderades.", "urgent")
   }
@@ -117,7 +126,9 @@ BarWidget {
     id: deleteProc
     stdout: StdioCollector {
       waitForEnd: true
-      onStreamFinished: root.refresh()
+      onStreamFinished: {
+        root.refresh()
+      }
     }
   }
 
@@ -343,10 +354,91 @@ BarWidget {
       }
 
       // =======================================================================
-      // B. TOAST NOTIFICATION BANNER
+      // B. GLOBAL DELETE CONFIRMATION OVERLAY (Visible in both tabs)
       // =======================================================================
       Rectangle {
-        visible: root.toastMessage !== ""
+        visible: root.confirmDelete
+        width: parent.width
+        implicitHeight: delCol.implicitHeight + Style.space(16)
+        radius: Style.space(6)
+        color: Style.normalFillFor(Color.urgent, Color.urgent)
+        border.color: Color.urgent
+
+        Column {
+          id: delCol
+          anchors.fill: parent
+          anchors.margins: Style.space(10)
+          spacing: Style.space(8)
+
+          Text {
+            text: "⚠ Vill du ta bort skärmdumpen: " + root.deleteTargetName + "?"
+            color: Color.urgent
+            font.family: root.bar.fontFamily
+            font.pixelSize: Style.font.bodySmall
+            font.bold: true
+            wrapMode: Text.WordWrap
+            width: parent.width
+          }
+
+          Row {
+            spacing: Style.space(8)
+
+            Rectangle {
+              width: Style.space(110)
+              height: Style.space(30)
+              radius: Style.space(4)
+              color: Color.urgent
+
+              Text {
+                anchors.centerIn: parent
+                text: "Ja, ta bort"
+                color: Color.background
+                font.family: root.bar.fontFamily
+                font.pixelSize: Style.font.caption
+                font.bold: true
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.doDelete(root.deleteTargetPath)
+              }
+            }
+
+            Rectangle {
+              width: Style.space(90)
+              height: Style.space(30)
+              radius: Style.space(4)
+              color: Style.normalFillFor(root.bar.foreground, Color.accent)
+
+              Text {
+                anchors.centerIn: parent
+                text: "Avbryt"
+                color: root.bar.foreground
+                font.family: root.bar.fontFamily
+                font.pixelSize: Style.font.caption
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                  root.confirmDelete = false
+                  root.deleteTargetPath = ""
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // =======================================================================
+      // C. TOAST NOTIFICATION BANNER
+      // =======================================================================
+      Rectangle {
+        visible: root.toastMessage !== "" && !root.confirmDelete
         width: parent.width
         implicitHeight: toastText.implicitHeight + Style.space(12)
         radius: Style.space(6)
@@ -367,7 +459,7 @@ BarWidget {
       }
 
       // =======================================================================
-      // C. TABS ROW (Senaste / Historik)
+      // D. TABS ROW (Senaste / Historik)
       // =======================================================================
       Row {
         width: parent.width
@@ -443,7 +535,7 @@ BarWidget {
       }
 
       // =======================================================================
-      // D. TAB 1: PREVIEW & ACTIONS (Senaste skärmdump)
+      // E. TAB 1: PREVIEW & ACTIONS (Senaste skärmdump)
       // =======================================================================
       Column {
         width: parent.width
@@ -595,81 +687,7 @@ BarWidget {
           }
         }
 
-        // 3. Delete Confirmation Overlay
-        Rectangle {
-          visible: root.confirmDelete
-          width: parent.width
-          implicitHeight: delCol.implicitHeight + Style.space(16)
-          radius: Style.space(6)
-          color: Style.normalFillFor(Color.urgent, Color.urgent)
-          border.color: Color.urgent
-
-          Column {
-            id: delCol
-            anchors.fill: parent
-            anchors.margins: Style.space(10)
-            spacing: Style.space(8)
-
-            Text {
-              text: "⚠ Vill du verkligen ta bort denna skärmdump?"
-              color: Color.urgent
-              font.family: root.bar.fontFamily
-              font.pixelSize: Style.font.bodySmall
-              font.bold: true
-            }
-
-            Row {
-              spacing: Style.space(8)
-
-              Rectangle {
-                width: Style.space(110)
-                height: Style.space(30)
-                radius: Style.space(4)
-                color: Color.urgent
-
-                Text {
-                  anchors.centerIn: parent
-                  text: "Ja, ta bort"
-                  color: Color.background
-                  font.family: root.bar.fontFamily
-                  font.pixelSize: Style.font.caption
-                  font.bold: true
-                }
-
-                MouseArea {
-                  anchors.fill: parent
-                  hoverEnabled: true
-                  cursorShape: Qt.PointingHandCursor
-                  onClicked: root.doDelete(root.deleteTargetPath)
-                }
-              }
-
-              Rectangle {
-                width: Style.space(90)
-                height: Style.space(30)
-                radius: Style.space(4)
-                color: Style.normalFillFor(root.bar.foreground, Color.accent)
-
-                Text {
-                  anchors.centerIn: parent
-                  text: "Avbryt"
-                  color: root.bar.foreground
-                  font.family: root.bar.fontFamily
-                  font.pixelSize: Style.font.caption
-                }
-
-                MouseArea {
-                  anchors.fill: parent
-                  hoverEnabled: true
-                  cursorShape: Qt.PointingHandCursor
-                  onClicked: root.confirmDelete = false
-                }
-              }
-            }
-          }
-        }
-
-        // 4. Action Buttons Grid
+        // 3. Action Buttons Grid
         Column {
           width: parent.width
           spacing: Style.space(8)
@@ -851,7 +869,7 @@ BarWidget {
               cursorShape: Qt.PointingHandCursor
               onClicked: {
                 var target = root.currentScreenshot || root.latestScreenshot
-                if (target) root.askDelete(target.path)
+                if (target) root.askDelete(target.path, target.filename)
               }
             }
           }
@@ -859,7 +877,7 @@ BarWidget {
       }
 
       // =======================================================================
-      // E. TAB 2: HISTORY GALLERY (Spacious, Legible, Perfect Geometry)
+      // F. TAB 2: HISTORY GALLERY
       // =======================================================================
       Column {
         width: parent.width
@@ -883,196 +901,207 @@ BarWidget {
             clip: true
             boundsBehavior: Flickable.StopAtBounds
 
-            delegate: Rectangle {
+            delegate: Item {
               width: histListView.width
               height: Style.space(66)
-              radius: Style.space(6)
-              property bool isSelected: root.currentScreenshot && root.currentScreenshot.path === modelData.path
-              color: isSelected ? Style.normalFillFor(Color.accent, Color.accent) : (cardMouse.containsMouse ? Style.normalFillFor(root.bar.foreground, Color.accent) : Style.normalFillFor(root.bar.foreground, root.bar.foreground))
-              border.color: isSelected ? Color.accent : "transparent"
-              border.width: Style.space(1)
 
-              // Main clickable area to select item
-              MouseArea {
-                id: cardMouse
+              Rectangle {
                 anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                  root.currentScreenshot = modelData
-                  root.currentTab = "latest"
-                }
-              }
+                radius: Style.space(6)
+                property bool isSelected: root.currentScreenshot && root.currentScreenshot.path === modelData.path
+                color: isSelected ? Style.normalFillFor(Color.accent, Color.accent) : (cardMouse.containsMouse ? Style.normalFillFor(root.bar.foreground, Color.accent) : Style.normalFillFor(root.bar.foreground, root.bar.foreground))
+                border.color: isSelected ? Color.accent : "transparent"
+                border.width: Style.space(1)
 
-              // Left Section: Thumbnail & Metadata Text
-              Row {
-                anchors.left: parent.left
-                anchors.leftMargin: Style.space(8)
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Style.space(10)
-
-                // Thumbnail
-                Rectangle {
-                  width: Style.space(56)
-                  height: Style.space(48)
-                  radius: Style.space(4)
-                  color: "#111"
-                  border.color: Style.normalFillFor(root.bar.foreground, Color.accent)
+                // Left Section: Thumbnail & Metadata Text
+                Row {
+                  anchors.left: parent.left
+                  anchors.leftMargin: Style.space(8)
+                  anchors.right: actionsRow.left
+                  anchors.rightMargin: Style.space(8)
                   anchors.verticalCenter: parent.verticalCenter
-                  clip: true
+                  spacing: Style.space(10)
 
-                  Image {
-                    anchors.fill: parent
-                    anchors.margins: Style.space(2)
-                    source: modelData.uri
-                    fillMode: Image.PreserveAspectCrop
-                    asynchronous: true
-                    cache: true
-                  }
-                }
+                  // Thumbnail
+                  Rectangle {
+                    width: Style.space(56)
+                    height: Style.space(48)
+                    radius: Style.space(4)
+                    color: "#111"
+                    border.color: Style.normalFillFor(root.bar.foreground, Color.accent)
+                    anchors.verticalCenter: parent.verticalCenter
+                    clip: true
 
-                // Metadata Column
-                Column {
-                  width: Style.space(230)
-                  anchors.verticalCenter: parent.verticalCenter
-                  spacing: Style.space(3)
-
-                  // Filename
-                  Text {
-                    text: modelData.filename
-                    color: root.bar.foreground
-                    font.family: root.bar.fontFamily
-                    font.pixelSize: Style.font.bodySmall
-                    font.bold: true
-                    elide: Text.ElideMiddle
-                    width: parent.width
+                    Image {
+                      anchors.fill: parent
+                      anchors.margins: Style.space(2)
+                      source: modelData.uri
+                      fillMode: Image.PreserveAspectCrop
+                      asynchronous: true
+                      cache: true
+                    }
                   }
 
-                  // Specs Row (Dimensions & Size)
-                  Row {
-                    spacing: Style.space(6)
+                  // Metadata Column
+                  Column {
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width - Style.space(66)
+                    spacing: Style.space(3)
+
+                    // Filename
                     Text {
-                      text: modelData.dimensions || ""
-                      color: Color.accent
+                      text: modelData.filename
+                      color: root.bar.foreground
                       font.family: root.bar.fontFamily
-                      font.pixelSize: Style.font.caption - 1
+                      font.pixelSize: Style.font.bodySmall
                       font.bold: true
+                      elide: Text.ElideMiddle
+                      width: parent.width
                     }
-                    Text {
-                      text: "•"
-                      color: Qt.darker(root.bar.foreground, 1.5)
-                      font.pixelSize: Style.font.caption - 1
+
+                    // Specs Row (Dimensions & Size)
+                    Row {
+                      spacing: Style.space(6)
+                      Text {
+                        text: modelData.dimensions || ""
+                        color: Color.accent
+                        font.family: root.bar.fontFamily
+                        font.pixelSize: Style.font.caption - 1
+                        font.bold: true
+                      }
+                      Text {
+                        text: "•"
+                        color: Qt.darker(root.bar.foreground, 1.5)
+                        font.pixelSize: Style.font.caption - 1
+                      }
+                      Text {
+                        text: modelData.size_human
+                        color: Qt.darker(root.bar.foreground, 1.2)
+                        font.family: root.bar.fontFamily
+                        font.pixelSize: Style.font.caption - 1
+                      }
                     }
+
+                    // Date
                     Text {
-                      text: modelData.size_human
-                      color: Qt.darker(root.bar.foreground, 1.2)
+                      text: modelData.relative_time
+                      color: Qt.darker(root.bar.foreground, 1.4)
                       font.family: root.bar.fontFamily
-                      font.pixelSize: Style.font.caption - 1
+                      font.pixelSize: Style.font.caption - 2
+                    }
+                  }
+                }
+
+                // Clickable area covering thumbnail & text to select
+                MouseArea {
+                  id: cardMouse
+                  anchors.left: parent.left
+                  anchors.top: parent.top
+                  anchors.bottom: parent.bottom
+                  anchors.right: actionsRow.left
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: {
+                    root.currentScreenshot = modelData
+                    root.currentTab = "latest"
+                  }
+                }
+
+                // Right Section: Quick Action Buttons (Independent z-order and MouseAreas)
+                Row {
+                  id: actionsRow
+                  anchors.right: parent.right
+                  anchors.rightMargin: Style.space(8)
+                  anchors.verticalCenter: parent.verticalCenter
+                  spacing: Style.space(4)
+                  z: 10
+
+                  // Edit Button
+                  Rectangle {
+                    width: Style.space(30)
+                    height: Style.space(30)
+                    radius: Style.space(4)
+                    color: hEditMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
+
+                    Text {
+                      anchors.centerIn: parent
+                      text: "✏️"
+                      font.pixelSize: Style.font.caption
+                    }
+
+                    MouseArea {
+                      id: hEditMouse
+                      anchors.fill: parent
+                      hoverEnabled: true
+                      cursorShape: Qt.PointingHandCursor
+                      onClicked: root.editImage(modelData.path)
                     }
                   }
 
-                  // Date
-                  Text {
-                    text: modelData.relative_time
-                    color: Qt.darker(root.bar.foreground, 1.4)
-                    font.family: root.bar.fontFamily
-                    font.pixelSize: Style.font.caption - 2
-                  }
-                }
-              }
+                  // Copy Path Button
+                  Rectangle {
+                    width: Style.space(30)
+                    height: Style.space(30)
+                    radius: Style.space(4)
+                    color: hCopyMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
 
-              // Right Section: Quick Action Buttons
-              Row {
-                anchors.right: parent.right
-                anchors.rightMargin: Style.space(8)
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Style.space(4)
+                    Text {
+                      anchors.centerIn: parent
+                      text: "📋"
+                      font.pixelSize: Style.font.caption
+                    }
 
-                // Edit Button
-                Rectangle {
-                  width: Style.space(30)
-                  height: Style.space(30)
-                  radius: Style.space(4)
-                  color: hEditMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
-
-                  Text {
-                    anchors.centerIn: parent
-                    text: "✏️"
-                    font.pixelSize: Style.font.caption
+                    MouseArea {
+                      id: hCopyMouse
+                      anchors.fill: parent
+                      hoverEnabled: true
+                      cursorShape: Qt.PointingHandCursor
+                      onClicked: root.copyPath(modelData.path)
+                    }
                   }
 
-                  MouseArea {
-                    id: hEditMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.editImage(modelData.path)
-                  }
-                }
+                  // View Button
+                  Rectangle {
+                    width: Style.space(30)
+                    height: Style.space(30)
+                    radius: Style.space(4)
+                    color: hViewMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
 
-                // Copy Path Button
-                Rectangle {
-                  width: Style.space(30)
-                  height: Style.space(30)
-                  radius: Style.space(4)
-                  color: hCopyMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
+                    Text {
+                      anchors.centerIn: parent
+                      text: "👁️"
+                      font.pixelSize: Style.font.caption
+                    }
 
-                  Text {
-                    anchors.centerIn: parent
-                    text: "📋"
-                    font.pixelSize: Style.font.caption
-                  }
-
-                  MouseArea {
-                    id: hCopyMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.copyPath(modelData.path)
-                  }
-                }
-
-                // View Button
-                Rectangle {
-                  width: Style.space(30)
-                  height: Style.space(30)
-                  radius: Style.space(4)
-                  color: hViewMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
-
-                  Text {
-                    anchors.centerIn: parent
-                    text: "👁️"
-                    font.pixelSize: Style.font.caption
+                    MouseArea {
+                      id: hViewMouse
+                      anchors.fill: parent
+                      hoverEnabled: true
+                      cursorShape: Qt.PointingHandCursor
+                      onClicked: root.viewImage(modelData.path)
+                    }
                   }
 
-                  MouseArea {
-                    id: hViewMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.viewImage(modelData.path)
-                  }
-                }
+                  // Delete Button
+                  Rectangle {
+                    width: Style.space(30)
+                    height: Style.space(30)
+                    radius: Style.space(4)
+                    color: hDelMouse.containsMouse ? Color.urgent : Style.normalFillFor(root.bar.foreground, Color.urgent)
 
-                // Delete Button
-                Rectangle {
-                  width: Style.space(30)
-                  height: Style.space(30)
-                  radius: Style.space(4)
-                  color: hDelMouse.containsMouse ? Color.urgent : Style.normalFillFor(root.bar.foreground, Color.urgent)
+                    Text {
+                      anchors.centerIn: parent
+                      text: "🗑️"
+                      font.pixelSize: Style.font.caption
+                    }
 
-                  Text {
-                    anchors.centerIn: parent
-                    text: "🗑️"
-                    font.pixelSize: Style.font.caption
-                  }
-
-                  MouseArea {
-                    id: hDelMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.askDelete(modelData.path)
+                    MouseArea {
+                      id: hDelMouse
+                      anchors.fill: parent
+                      hoverEnabled: true
+                      cursorShape: Qt.PointingHandCursor
+                      onClicked: root.askDelete(modelData.path, modelData.filename)
+                    }
                   }
                 }
               }
