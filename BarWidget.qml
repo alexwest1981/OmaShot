@@ -224,12 +224,12 @@ BarWidget {
     bar: root.bar
     owner: root
     open: root.popupOpen
-    contentWidth: popup.fittedContentWidth(Style.space(560))
-    contentHeight: popup.fittedContentHeight(mainColumn.implicitHeight + Style.space(28))
+    contentWidth: popup.fittedContentWidth(Style.space(540))
+    contentHeight: popup.fittedContentHeight(mainColumn.implicitHeight + Style.space(24))
 
     Column {
       id: mainColumn
-      width: Style.space(560)
+      width: parent.width
       spacing: Style.space(10)
 
       // =======================================================================
