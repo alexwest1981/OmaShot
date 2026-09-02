@@ -204,12 +204,12 @@ BarWidget {
     bar: root.bar
     owner: root
     open: root.popupOpen
-    contentWidth: popup.fittedContentWidth(Style.space(480))
+    contentWidth: popup.fittedContentWidth(Style.space(490))
     contentHeight: popup.fittedContentHeight(mainColumn.implicitHeight + Style.space(24))
 
     Column {
       id: mainColumn
-      width: Style.space(480)
+      width: Style.space(490)
       spacing: Style.space(12)
 
       // =======================================================================
@@ -859,7 +859,7 @@ BarWidget {
       }
 
       // =======================================================================
-      // E. TAB 2: HISTORY GALLERY (Spacious, Legible Cards)
+      // E. TAB 2: HISTORY GALLERY (Spacious, Legible, Perfect Geometry)
       // =======================================================================
       Column {
         width: parent.width
@@ -868,249 +868,237 @@ BarWidget {
 
         Rectangle {
           width: parent.width
-          implicitHeight: Math.min(Style.space(420), historyCol.implicitHeight + Style.space(12))
+          height: Style.space(420)
           radius: Style.space(8)
-          color: Style.normalFillFor(root.bar.foreground, Color.accent)
+          color: Color.background
+          border.color: Style.normalFillFor(root.bar.foreground, Color.accent)
           clip: true
 
-          Flickable {
+          ListView {
+            id: histListView
             anchors.fill: parent
             anchors.margins: Style.space(6)
-            contentHeight: historyCol.implicitHeight
-            boundsBehavior: Flickable.StopAtBounds
+            spacing: Style.space(6)
+            model: root.screenshots
             clip: true
+            boundsBehavior: Flickable.StopAtBounds
 
-            Column {
-              id: historyCol
-              width: parent.width
-              spacing: Style.space(6)
+            delegate: Rectangle {
+              width: histListView.width
+              height: Style.space(66)
+              radius: Style.space(6)
+              property bool isSelected: root.currentScreenshot && root.currentScreenshot.path === modelData.path
+              color: isSelected ? Style.normalFillFor(Color.accent, Color.accent) : (cardMouse.containsMouse ? Style.normalFillFor(root.bar.foreground, Color.accent) : Style.normalFillFor(root.bar.foreground, root.bar.foreground))
+              border.color: isSelected ? Color.accent : "transparent"
+              border.width: Style.space(1)
 
-              Repeater {
-                model: root.screenshots
+              // Main clickable area to select item
+              MouseArea {
+                id: cardMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                  root.currentScreenshot = modelData
+                  root.currentTab = "latest"
+                }
+              }
 
+              // Left Section: Thumbnail & Metadata Text
+              Row {
+                anchors.left: parent.left
+                anchors.leftMargin: Style.space(8)
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Style.space(10)
+
+                // Thumbnail
                 Rectangle {
-                  width: historyCol.width
-                  implicitHeight: histRow.implicitHeight + Style.space(14)
-                  radius: Style.space(6)
-                  property bool isSelected: root.currentScreenshot && root.currentScreenshot.path === modelData.path
-                  color: isSelected ? Style.normalFillFor(Color.accent, Color.accent) : (histMouse.containsMouse ? Style.normalFillFor(root.bar.foreground, Color.accent) : "transparent")
-                  border.color: isSelected ? Color.accent : "transparent"
-                  border.width: Style.space(1)
+                  width: Style.space(56)
+                  height: Style.space(48)
+                  radius: Style.space(4)
+                  color: "#111"
+                  border.color: Style.normalFillFor(root.bar.foreground, Color.accent)
+                  anchors.verticalCenter: parent.verticalCenter
+                  clip: true
 
-                  Row {
-                    id: histRow
+                  Image {
                     anchors.fill: parent
-                    anchors.margins: Style.space(8)
-                    spacing: Style.space(12)
+                    anchors.margins: Style.space(2)
+                    source: modelData.uri
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                    cache: true
+                  }
+                }
 
-                    // 1. Large Thumbnail Box
-                    Rectangle {
-                      width: Style.space(64)
-                      height: Style.space(54)
-                      radius: Style.space(4)
-                      color: Color.background
-                      border.color: Style.normalFillFor(root.bar.foreground, Color.accent)
-                      anchors.verticalCenter: parent.verticalCenter
-                      clip: true
+                // Metadata Column
+                Column {
+                  width: Style.space(230)
+                  anchors.verticalCenter: parent.verticalCenter
+                  spacing: Style.space(3)
 
-                      Image {
-                        anchors.fill: parent
-                        anchors.margins: Style.space(2)
-                        source: modelData.uri
-                        fillMode: Image.PreserveAspectFit
-                        asynchronous: true
-                        cache: true
-                      }
+                  // Filename
+                  Text {
+                    text: modelData.filename
+                    color: root.bar.foreground
+                    font.family: root.bar.fontFamily
+                    font.pixelSize: Style.font.bodySmall
+                    font.bold: true
+                    elide: Text.ElideMiddle
+                    width: parent.width
+                  }
+
+                  // Specs Row (Dimensions & Size)
+                  Row {
+                    spacing: Style.space(6)
+                    Text {
+                      text: modelData.dimensions || ""
+                      color: Color.accent
+                      font.family: root.bar.fontFamily
+                      font.pixelSize: Style.font.caption - 1
+                      font.bold: true
                     }
-
-                    // 2. Large, Clear Metadata Text
-                    Column {
-                      width: parent.width - Style.space(220)
-                      anchors.verticalCenter: parent.verticalCenter
-                      spacing: Style.space(4)
-
-                      // Filename (Big & Bold)
-                      Text {
-                        text: modelData.filename
-                        color: root.bar.foreground
-                        font.family: root.bar.fontFamily
-                        font.pixelSize: Style.font.bodySmall
-                        font.bold: true
-                        elide: Text.ElideMiddle
-                        width: parent.width
-                      }
-
-                      // Specs Row (Dimensions & File Size)
-                      Row {
-                        spacing: Style.space(6)
-                        Text {
-                          text: modelData.dimensions || ""
-                          color: Color.accent
-                          font.family: root.bar.fontFamily
-                          font.pixelSize: Style.font.caption
-                          font.bold: true
-                        }
-                        Text {
-                          text: "•"
-                          color: Qt.darker(root.bar.foreground, 1.5)
-                          font.pixelSize: Style.font.caption
-                        }
-                        Text {
-                          text: modelData.size_human
-                          color: Qt.darker(root.bar.foreground, 1.2)
-                          font.family: root.bar.fontFamily
-                          font.pixelSize: Style.font.caption
-                          font.bold: true
-                        }
-                      }
-
-                      // Timestamp
-                      Row {
-                        spacing: Style.space(4)
-                        Text { text: "🕒"; font.pixelSize: Style.font.caption - 2 }
-                        Text {
-                          text: modelData.relative_time
-                          color: Qt.darker(root.bar.foreground, 1.3)
-                          font.family: root.bar.fontFamily
-                          font.pixelSize: Style.font.caption
-                        }
-                      }
+                    Text {
+                      text: "•"
+                      color: Qt.darker(root.bar.foreground, 1.5)
+                      font.pixelSize: Style.font.caption - 1
                     }
-
-                    // 3. Large, Easy-to-Click Action Buttons on the right
-                    Row {
-                      anchors.right: parent.right
-                      anchors.verticalCenter: parent.verticalCenter
-                      spacing: Style.space(6)
-
-                      // Edit Button
-                      Rectangle {
-                        width: Style.space(32)
-                        height: Style.space(32)
-                        radius: Style.space(4)
-                        color: hEditMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
-
-                        Text {
-                          anchors.centerIn: parent
-                          text: "✏️"
-                          font.pixelSize: Style.font.bodySmall
-                        }
-
-                        MouseArea {
-                          id: hEditMouse
-                          anchors.fill: parent
-                          hoverEnabled: true
-                          cursorShape: Qt.PointingHandCursor
-                          onClicked: root.editImage(modelData.path)
-                        }
-                      }
-
-                      // Copy Path Button
-                      Rectangle {
-                        width: Style.space(32)
-                        height: Style.space(32)
-                        radius: Style.space(4)
-                        color: hCopyMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
-
-                        Text {
-                          anchors.centerIn: parent
-                          text: "📋"
-                          font.pixelSize: Style.font.bodySmall
-                        }
-
-                        MouseArea {
-                          id: hCopyMouse
-                          anchors.fill: parent
-                          hoverEnabled: true
-                          cursorShape: Qt.PointingHandCursor
-                          onClicked: root.copyPath(modelData.path)
-                        }
-                      }
-
-                      // View Button
-                      Rectangle {
-                        width: Style.space(32)
-                        height: Style.space(32)
-                        radius: Style.space(4)
-                        color: hViewMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
-
-                        Text {
-                          anchors.centerIn: parent
-                          text: "👁️"
-                          font.pixelSize: Style.font.bodySmall
-                        }
-
-                        MouseArea {
-                          id: hViewMouse
-                          anchors.fill: parent
-                          hoverEnabled: true
-                          cursorShape: Qt.PointingHandCursor
-                          onClicked: root.viewImage(modelData.path)
-                        }
-                      }
-
-                      // Delete Button
-                      Rectangle {
-                        width: Style.space(32)
-                        height: Style.space(32)
-                        radius: Style.space(4)
-                        color: hDelMouse.containsMouse ? Color.urgent : Style.normalFillFor(root.bar.foreground, Color.urgent)
-
-                        Text {
-                          anchors.centerIn: parent
-                          text: "🗑️"
-                          font.pixelSize: Style.font.bodySmall
-                        }
-
-                        MouseArea {
-                          id: hDelMouse
-                          anchors.fill: parent
-                          hoverEnabled: true
-                          cursorShape: Qt.PointingHandCursor
-                          onClicked: root.askDelete(modelData.path)
-                        }
-                      }
+                    Text {
+                      text: modelData.size_human
+                      color: Qt.darker(root.bar.foreground, 1.2)
+                      font.family: root.bar.fontFamily
+                      font.pixelSize: Style.font.caption - 1
                     }
                   }
 
-                  // Row click switches to preview
-                  MouseArea {
-                    id: histMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    acceptedButtons: Qt.LeftButton
-                    onClicked: {
-                      root.currentScreenshot = modelData
-                      root.currentTab = "latest"
-                    }
+                  // Date
+                  Text {
+                    text: modelData.relative_time
+                    color: Qt.darker(root.bar.foreground, 1.4)
+                    font.family: root.bar.fontFamily
+                    font.pixelSize: Style.font.caption - 2
                   }
                 }
               }
 
-              // Empty State
-              Item {
-                width: parent.width
-                height: Style.space(120)
-                visible: !root.screenshots || root.screenshots.length === 0
+              // Right Section: Quick Action Buttons
+              Row {
+                anchors.right: parent.right
+                anchors.rightMargin: Style.space(8)
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Style.space(4)
 
-                Column {
-                  anchors.centerIn: parent
-                  spacing: Style.space(8)
+                // Edit Button
+                Rectangle {
+                  width: Style.space(30)
+                  height: Style.space(30)
+                  radius: Style.space(4)
+                  color: hEditMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
+
                   Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: "📷"
-                    font.pixelSize: Style.font.display
+                    anchors.centerIn: parent
+                    text: "✏️"
+                    font.pixelSize: Style.font.caption
                   }
-                  Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: "Ingen historik än"
-                    color: root.bar.foreground
-                    font.family: root.bar.fontFamily
-                    font.pixelSize: Style.font.body
-                    font.bold: true
+
+                  MouseArea {
+                    id: hEditMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.editImage(modelData.path)
                   }
                 }
+
+                // Copy Path Button
+                Rectangle {
+                  width: Style.space(30)
+                  height: Style.space(30)
+                  radius: Style.space(4)
+                  color: hCopyMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
+
+                  Text {
+                    anchors.centerIn: parent
+                    text: "📋"
+                    font.pixelSize: Style.font.caption
+                  }
+
+                  MouseArea {
+                    id: hCopyMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.copyPath(modelData.path)
+                  }
+                }
+
+                // View Button
+                Rectangle {
+                  width: Style.space(30)
+                  height: Style.space(30)
+                  radius: Style.space(4)
+                  color: hViewMouse.containsMouse ? Color.accent : Style.normalFillFor(root.bar.foreground, Color.accent)
+
+                  Text {
+                    anchors.centerIn: parent
+                    text: "👁️"
+                    font.pixelSize: Style.font.caption
+                  }
+
+                  MouseArea {
+                    id: hViewMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.viewImage(modelData.path)
+                  }
+                }
+
+                // Delete Button
+                Rectangle {
+                  width: Style.space(30)
+                  height: Style.space(30)
+                  radius: Style.space(4)
+                  color: hDelMouse.containsMouse ? Color.urgent : Style.normalFillFor(root.bar.foreground, Color.urgent)
+
+                  Text {
+                    anchors.centerIn: parent
+                    text: "🗑️"
+                    font.pixelSize: Style.font.caption
+                  }
+
+                  MouseArea {
+                    id: hDelMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.askDelete(modelData.path)
+                  }
+                }
+              }
+            }
+          }
+
+          // Empty State
+          Item {
+            anchors.fill: parent
+            visible: !root.screenshots || root.screenshots.length === 0
+
+            Column {
+              anchors.centerIn: parent
+              spacing: Style.space(8)
+              Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "📷"
+                font.pixelSize: Style.font.display
+              }
+              Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Ingen historik än"
+                color: root.bar.foreground
+                font.family: root.bar.fontFamily
+                font.pixelSize: Style.font.body
+                font.bold: true
               }
             }
           }
