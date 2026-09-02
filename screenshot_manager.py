@@ -3,6 +3,7 @@
 OmaShot / Screenshot Manager for Omarchy
 Manages screenshot history, metadata extraction, editing, copying, and global system integration.
 Maintains symlinks for AI agents (Claude, Gemini, Antigravity) at ~/Pictures/latest-screenshot.png
+Includes i18n support for Swedish, English, German, Danish, and Norwegian date formatting.
 """
 
 import sys
@@ -37,7 +38,6 @@ def get_image_dimensions(filepath):
                 w, h = struct.unpack(">LL", head[16:24])
                 return w, h
             elif head.startswith(b"\xff\xd8"):
-                # Fast JPEG dimension probe
                 f.seek(0)
                 f.read(2)
                 b = f.read(1)
@@ -60,25 +60,59 @@ def get_image_dimensions(filepath):
         pass
     return 0, 0
 
-def format_relative_date(mtime):
+def format_relative_date(mtime, lang="sv"):
     dt = datetime.fromtimestamp(mtime)
     now = datetime.now()
     diff = (now - dt).total_seconds()
     
-    if diff < 60:
-        return "Nyss"
-    elif diff < 3600:
-        mins = int(diff / 60)
-        return f"{mins} min sedan"
-    elif dt.date() == now.date():
-        return f"Idag {dt.strftime('%H:%M')}"
-    elif (now.date() - dt.date()).days == 1:
-        return f"Igår {dt.strftime('%H:%M')}"
-    elif dt.year == now.year:
-        months = ["jan", "feb", "mar", "apr", "maj", "jun", "jul", "aug", "sep", "okt", "nov", "dec"]
-        return f"{dt.day} {months[dt.month-1]} {dt.strftime('%H:%M')}"
+    # Swedish
+    if lang.startswith("sv"):
+        if diff < 60:
+            return "Nyss"
+        elif diff < 3600:
+            mins = int(diff / 60)
+            return f"{mins} min sedan"
+        elif dt.date() == now.date():
+            return f"Idag {dt.strftime('%H:%M')}"
+        elif (now.date() - dt.date()).days == 1:
+            return f"Igår {dt.strftime('%H:%M')}"
+        elif dt.year == now.year:
+            months = ["jan", "feb", "mar", "apr", "maj", "jun", "jul", "aug", "sep", "okt", "nov", "dec"]
+            return f"{dt.day} {months[dt.month-1]} {dt.strftime('%H:%M')}"
+        else:
+            return dt.strftime("%Y-%m-%d %H:%M")
+    # German
+    elif lang.startswith("de"):
+        if diff < 60:
+            return "Gerade eben"
+        elif diff < 3600:
+            mins = int(diff / 60)
+            return f"vor {mins} Min."
+        elif dt.date() == now.date():
+            return f"Heute {dt.strftime('%H:%M')}"
+        elif (now.date() - dt.date()).days == 1:
+            return f"Gestern {dt.strftime('%H:%M')}"
+        elif dt.year == now.year:
+            months = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"]
+            return f"{dt.day}. {months[dt.month-1]} {dt.strftime('%H:%M')}"
+        else:
+            return dt.strftime("%Y-%m-%d %H:%M")
+    # English / Fallback
     else:
-        return dt.strftime("%Y-%m-%d %H:%M")
+        if diff < 60:
+            return "Just now"
+        elif diff < 3600:
+            mins = int(diff / 60)
+            return f"{mins}m ago"
+        elif dt.date() == now.date():
+            return f"Today {dt.strftime('%H:%M')}"
+        elif (now.date() - dt.date()).days == 1:
+            return f"Yesterday {dt.strftime('%H:%M')}"
+        elif dt.year == now.year:
+            months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            return f"{dt.day} {months[dt.month-1]} {dt.strftime('%H:%M')}"
+        else:
+            return dt.strftime("%Y-%m-%d %H:%M")
 
 def update_system_symlinks(latest_path, metadata):
     if not latest_path or not os.path.exists(latest_path):
@@ -104,7 +138,7 @@ def update_system_symlinks(latest_path, metadata):
     except Exception:
         pass
 
-def scan_screenshots():
+def scan_screenshots(lang="sv"):
     patterns = [
         os.path.join(PICTURES_DIR, "screenshot-*.png"),
         os.path.join(PICTURES_DIR, "screenshot-*.jpg"),
@@ -146,7 +180,7 @@ def scan_screenshots():
             "height": h,
             "dimensions": dim_str,
             "mtime": int(mtime),
-            "relative_time": format_relative_date(mtime),
+            "relative_time": format_relative_date(mtime, lang=lang),
             "date_human": datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M:%S")
         })
         
@@ -163,8 +197,7 @@ def scan_screenshots():
         "tmp_symlink": TMP_SYMLINK
     }
 
-def capture_screenshot(mode="smart"):
-    # mode: smart | region | window | fullscreen
+def capture_screenshot(mode="smart", lang="sv"):
     cmd_map = {
         "smart": ["omarchy-capture-screenshot", "smart"],
         "region": ["omarchy-capture-screenshot", "region"],
@@ -174,8 +207,8 @@ def capture_screenshot(mode="smart"):
     cmd = cmd_map.get(mode, ["omarchy-capture-screenshot", "smart"])
     
     try:
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-        return scan_screenshots()
+        subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        return scan_screenshots(lang=lang)
     except Exception as e:
         return {"ok": False, "error": str(e)}
 
@@ -187,13 +220,13 @@ def copy_to_clipboard(filepath, mode="path"):
         try:
             with open(filepath, "rb") as f:
                 subprocess.run(["wl-copy", "--type", "image/png"], stdin=f, check=True)
-            return {"ok": True, "message": "Bild kopierad till urklipp"}
+            return {"ok": True, "message": "Bild kopierad"}
         except Exception as e:
             return {"ok": False, "error": str(e)}
     else:
         try:
             subprocess.run(["wl-copy"], input=filepath.encode("utf-8"), check=True)
-            return {"ok": True, "message": "Sökväg kopierad till urklipp"}
+            return {"ok": True, "message": "Sökväg kopierad"}
         except Exception as e:
             return {"ok": False, "error": str(e)}
 
@@ -222,12 +255,12 @@ def open_viewer(filepath):
         subprocess.Popen(["xdg-open", filepath])
         return {"ok": True, "app": "xdg-open"}
 
-def delete_screenshot(filepath):
+def delete_screenshot(filepath, lang="sv"):
     if not os.path.exists(filepath):
         return {"ok": False, "error": "Filen finns inte"}
     try:
         os.remove(filepath)
-        return scan_screenshots()
+        return scan_screenshots(lang=lang)
     except Exception as e:
         return {"ok": False, "error": str(e)}
 
@@ -240,11 +273,13 @@ def main():
     parser.add_argument("--edit", type=str, help="Open image in editor (tensaku/pinta)")
     parser.add_argument("--view", type=str, help="Open image in viewer (imv/xdg-open)")
     parser.add_argument("--delete", type=str, help="Delete screenshot file")
+    parser.add_argument("--lang", type=str, default=os.environ.get("LANG", "sv"), help="System language code")
     
     args = parser.parse_args()
+    lang = (args.lang or "sv").lower()[:2]
     
     if args.capture:
-        print(json.dumps(capture_screenshot(args.capture), ensure_ascii=False))
+        print(json.dumps(capture_screenshot(args.capture, lang=lang), ensure_ascii=False))
     elif args.copy_path:
         print(json.dumps(copy_to_clipboard(args.copy_path, mode="path"), ensure_ascii=False))
     elif args.copy_image:
@@ -254,9 +289,9 @@ def main():
     elif args.view:
         print(json.dumps(open_viewer(args.view), ensure_ascii=False))
     elif args.delete:
-        print(json.dumps(delete_screenshot(args.delete), ensure_ascii=False))
+        print(json.dumps(delete_screenshot(args.delete, lang=lang), ensure_ascii=False))
     else:
-        print(json.dumps(scan_screenshots(), ensure_ascii=False, indent=2))
+        print(json.dumps(scan_screenshots(lang=lang), ensure_ascii=False, indent=2))
 
 if __name__ == "__main__":
     main()

@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Commons
 import qs.Ui
+import "./I18n.js" as I18n
 
 BarWidget {
   id: root
@@ -19,6 +20,12 @@ BarWidget {
   property bool confirmDelete: false
   property string deleteTargetPath: ""
   property string deleteTargetName: ""
+
+  readonly property string systemLang: Quickshell.env("LANG") || Qt.locale().name
+
+  function tr(key, params) {
+    return I18n.t(key, params, root.systemLang, Qt.locale().name)
+  }
 
   function showToast(msg, type) {
     toastMessage = msg
@@ -38,7 +45,7 @@ BarWidget {
 
   function triggerCapture(mode) {
     root.popupOpen = false
-    captureProc.command = ["python3", Quickshell.env("HOME") + "/.config/omarchy/plugins/custom.screenshots/screenshot_manager.py", "--capture", mode || "smart"]
+    captureProc.command = ["python3", Quickshell.env("HOME") + "/.config/omarchy/plugins/custom.screenshots/screenshot_manager.py", "--capture", mode || "smart", "--lang", root.systemLang]
     captureProc.running = true
   }
 
@@ -46,14 +53,14 @@ BarWidget {
     if (!fpath) return
     copyPathProc.command = ["python3", Quickshell.env("HOME") + "/.config/omarchy/plugins/custom.screenshots/screenshot_manager.py", "--copy-path", fpath]
     copyPathProc.running = true
-    showToast("📋 Sökvägen kopierad! Klistra in direkt till AI/Claude/Gemini.", "success")
+    showToast(root.tr("toast_path_copied"), "success")
   }
 
   function copyImage(fpath) {
     if (!fpath) return
     copyImageProc.command = ["python3", Quickshell.env("HOME") + "/.config/omarchy/plugins/custom.screenshots/screenshot_manager.py", "--copy-image", fpath]
     copyImageProc.running = true
-    showToast("🖼️ Bilddata kopierad till urklipp!", "success")
+    showToast(root.tr("toast_image_copied"), "success")
   }
 
   function editImage(fpath) {
@@ -85,9 +92,9 @@ BarWidget {
     if (root.currentScreenshot && root.currentScreenshot.path === target) {
       root.currentScreenshot = null
     }
-    deleteProc.command = ["python3", Quickshell.env("HOME") + "/.config/omarchy/plugins/custom.screenshots/screenshot_manager.py", "--delete", target]
+    deleteProc.command = ["python3", Quickshell.env("HOME") + "/.config/omarchy/plugins/custom.screenshots/screenshot_manager.py", "--delete", target, "--lang", root.systemLang]
     deleteProc.running = true
-    showToast("🗑️ Skärmdumpen raderades.", "urgent")
+    showToast(root.tr("toast_deleted"), "urgent")
   }
 
   implicitWidth: contentRow.implicitWidth + Style.space(16)
@@ -98,7 +105,7 @@ BarWidget {
   // ---------------------------------------------------------------------------
   Process {
     id: listProc
-    command: ["python3", Quickshell.env("HOME") + "/.config/omarchy/plugins/custom.screenshots/screenshot_manager.py", "--list"]
+    command: ["python3", Quickshell.env("HOME") + "/.config/omarchy/plugins/custom.screenshots/screenshot_manager.py", "--list", "--lang", root.systemLang]
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: {
@@ -196,11 +203,13 @@ BarWidget {
     }
     onEntered: {
       if (!root.bar) return
-      var tip = "Skärmdumpar (" + root.totalCount + " st)\n"
-      if (root.latestScreenshot) {
-        tip += "Senaste: " + root.latestScreenshot.filename + " (" + root.latestScreenshot.relative_time + ")\n"
-      }
-      tip += "Vänsterklick för galleri | Högerklick för snabbtagning"
+      var fname = root.latestScreenshot ? root.latestScreenshot.filename : ""
+      var ftime = root.latestScreenshot ? root.latestScreenshot.relative_time : ""
+      var tip = root.tr("tooltip_title", {
+        count: root.totalCount,
+        filename: fname,
+        time: ftime
+      })
       root.bar.showTooltip(root, tip.trim())
     }
     onExited: if (root.bar) root.bar.hideTooltip(root)
@@ -242,7 +251,7 @@ BarWidget {
           }
 
           Text {
-            text: "Skärmdumpar"
+            text: root.tr("title")
             color: root.bar.foreground
             font.family: root.bar.fontFamily
             font.pixelSize: Style.font.title
@@ -274,7 +283,7 @@ BarWidget {
                 anchors.verticalCenter: parent.verticalCenter
               }
               Text {
-                text: "Område"
+                text: root.tr("region")
                 color: areaMouse.containsMouse ? Color.background : root.bar.foreground
                 font.family: root.bar.fontFamily
                 font.pixelSize: Style.font.bodySmall
@@ -309,7 +318,7 @@ BarWidget {
                 anchors.verticalCenter: parent.verticalCenter
               }
               Text {
-                text: "Helskärm"
+                text: root.tr("fullscreen")
                 color: fullMouse.containsMouse ? Color.background : root.bar.foreground
                 font.family: root.bar.fontFamily
                 font.pixelSize: Style.font.bodySmall
@@ -354,7 +363,7 @@ BarWidget {
       }
 
       // =======================================================================
-      // B. GLOBAL DELETE CONFIRMATION OVERLAY (Visible in both tabs)
+      // B. GLOBAL DELETE CONFIRMATION OVERLAY
       // =======================================================================
       Rectangle {
         visible: root.confirmDelete
@@ -371,7 +380,7 @@ BarWidget {
           spacing: Style.space(8)
 
           Text {
-            text: "⚠ Vill du ta bort skärmdumpen: " + root.deleteTargetName + "?"
+            text: "⚠ " + root.tr("delete_confirm_title", { name: root.deleteTargetName })
             color: Color.urgent
             font.family: root.bar.fontFamily
             font.pixelSize: Style.font.bodySmall
@@ -391,7 +400,7 @@ BarWidget {
 
               Text {
                 anchors.centerIn: parent
-                text: "Ja, ta bort"
+                text: root.tr("delete_confirm_yes")
                 color: Color.background
                 font.family: root.bar.fontFamily
                 font.pixelSize: Style.font.caption
@@ -414,7 +423,7 @@ BarWidget {
 
               Text {
                 anchors.centerIn: parent
-                text: "Avbryt"
+                text: root.tr("delete_confirm_cancel")
                 color: root.bar.foreground
                 font.family: root.bar.fontFamily
                 font.pixelSize: Style.font.caption
@@ -459,13 +468,13 @@ BarWidget {
       }
 
       // =======================================================================
-      // D. TABS ROW (Senaste / Historik)
+      // D. TABS ROW (Preview / History)
       // =======================================================================
       Row {
         width: parent.width
         spacing: Style.space(8)
 
-        // Tab: Senaste / Preview
+        // Tab: Preview
         Rectangle {
           width: (parent.width - Style.space(8)) / 2
           height: Style.space(34)
@@ -482,7 +491,7 @@ BarWidget {
               anchors.verticalCenter: parent.verticalCenter
             }
             Text {
-              text: "Förhandsvisning"
+              text: root.tr("preview")
               color: root.currentTab === "latest" ? Color.background : root.bar.foreground
               font.family: root.bar.fontFamily
               font.pixelSize: Style.font.bodySmall
@@ -499,7 +508,7 @@ BarWidget {
           }
         }
 
-        // Tab: Historik
+        // Tab: History
         Rectangle {
           width: (parent.width - Style.space(8)) / 2
           height: Style.space(34)
@@ -516,7 +525,7 @@ BarWidget {
               anchors.verticalCenter: parent.verticalCenter
             }
             Text {
-              text: "Historik (" + root.totalCount + ")"
+              text: root.tr("history_with_count", { count: root.totalCount })
               color: root.currentTab === "history" ? Color.background : root.bar.foreground
               font.family: root.bar.fontFamily
               font.pixelSize: Style.font.bodySmall
@@ -535,7 +544,7 @@ BarWidget {
       }
 
       // =======================================================================
-      // E. TAB 1: PREVIEW & ACTIONS (Senaste skärmdump)
+      // E. TAB 1: PREVIEW & ACTIONS (Selected / Latest Screenshot)
       // =======================================================================
       Column {
         width: parent.width
@@ -577,15 +586,15 @@ BarWidget {
               }
               Text {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "Inga skärmdumpar hittades"
+                text: root.tr("empty_preview_title")
                 color: root.bar.foreground
                 font.family: root.bar.fontFamily
-                font.pixelSize: Style.font.titleSmall
+                font.pixelSize: Style.font.heading
                 font.bold: true
               }
               Text {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "Klicka på 'Område' eller 'Helskärm' för att ta en ny skärmdump."
+                text: root.tr("empty_preview_sub")
                 color: Qt.darker(root.bar.foreground, 1.4)
                 font.family: root.bar.fontFamily
                 font.pixelSize: Style.font.bodySmall
@@ -644,7 +653,7 @@ BarWidget {
                 Text {
                   text: {
                     var s = root.currentScreenshot || root.latestScreenshot
-                    return s && s.dimensions ? s.dimensions : "Okänd storlek"
+                    return s && s.dimensions ? s.dimensions : root.tr("unknown_size")
                   }
                   color: Color.accent
                   font.family: root.bar.fontFamily
@@ -698,7 +707,7 @@ BarWidget {
             width: parent.width
             spacing: Style.space(8)
 
-            // Redigera (Tensaku / Pinta)
+            // Edit (Tensaku / Pinta)
             Rectangle {
               width: (parent.width - Style.space(8)) / 2
               height: Style.space(36)
@@ -710,7 +719,7 @@ BarWidget {
                 spacing: Style.space(8)
                 Text { text: "✏️"; font.pixelSize: Style.font.body; anchors.verticalCenter: parent.verticalCenter }
                 Text {
-                  text: "Redigera / Rita"
+                  text: root.tr("edit")
                   color: Color.background
                   font.family: root.bar.fontFamily
                   font.pixelSize: Style.font.bodySmall
@@ -731,7 +740,7 @@ BarWidget {
               }
             }
 
-            // Visa Fullskärm (imv)
+            // View Fullscreen (imv)
             Rectangle {
               width: (parent.width - Style.space(8)) / 2
               height: Style.space(36)
@@ -745,7 +754,7 @@ BarWidget {
                 spacing: Style.space(8)
                 Text { text: "👁️"; font.pixelSize: Style.font.body; anchors.verticalCenter: parent.verticalCenter }
                 Text {
-                  text: "Visa fullstorlek"
+                  text: root.tr("view_full")
                   color: root.bar.foreground
                   font.family: root.bar.fontFamily
                   font.pixelSize: Style.font.bodySmall
@@ -772,7 +781,7 @@ BarWidget {
             width: parent.width
             spacing: Style.space(8)
 
-            // Kopiera Sökväg (Till Claude, Antigravity, Gemini)
+            // Copy Path
             Rectangle {
               width: (parent.width - Style.space(8)) / 2
               height: Style.space(34)
@@ -784,7 +793,7 @@ BarWidget {
                 spacing: Style.space(8)
                 Text { text: "📋"; font.pixelSize: Style.font.bodySmall; anchors.verticalCenter: parent.verticalCenter }
                 Text {
-                  text: "Kopiera sökväg"
+                  text: root.tr("copy_path")
                   color: root.bar.foreground
                   font.family: root.bar.fontFamily
                   font.pixelSize: Style.font.bodySmall
@@ -805,7 +814,7 @@ BarWidget {
               }
             }
 
-            // Kopiera Bilddata (Till Urklipp)
+            // Copy Image
             Rectangle {
               width: (parent.width - Style.space(8)) / 2
               height: Style.space(34)
@@ -817,7 +826,7 @@ BarWidget {
                 spacing: Style.space(8)
                 Text { text: "🖼️"; font.pixelSize: Style.font.bodySmall; anchors.verticalCenter: parent.verticalCenter }
                 Text {
-                  text: "Kopiera bild"
+                  text: root.tr("copy_image")
                   color: root.bar.foreground
                   font.family: root.bar.fontFamily
                   font.pixelSize: Style.font.bodySmall
@@ -839,7 +848,7 @@ BarWidget {
             }
           }
 
-          // Radera knapp
+          // Delete button
           Rectangle {
             width: parent.width
             height: Style.space(32)
@@ -853,7 +862,7 @@ BarWidget {
               spacing: Style.space(8)
               Text { text: "🗑️"; font.pixelSize: Style.font.bodySmall; anchors.verticalCenter: parent.verticalCenter }
               Text {
-                text: "Ta bort denna skärmdump"
+                text: root.tr("delete_btn")
                 color: Color.urgent
                 font.family: root.bar.fontFamily
                 font.pixelSize: Style.font.bodySmall
@@ -1007,7 +1016,7 @@ BarWidget {
                   }
                 }
 
-                // Right Section: Quick Action Buttons (Independent z-order and MouseAreas)
+                // Right Section: Quick Action Buttons
                 Row {
                   id: actionsRow
                   anchors.right: parent.right
@@ -1123,7 +1132,7 @@ BarWidget {
               }
               Text {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "Ingen historik än"
+                text: root.tr("empty_history_title")
                 color: root.bar.foreground
                 font.family: root.bar.fontFamily
                 font.pixelSize: Style.font.body
